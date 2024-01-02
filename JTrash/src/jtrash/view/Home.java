@@ -36,9 +36,11 @@ public class Home{
 		firstStage.setResizable(true);
 		firstStage.setTitle(Constants.Title.INITIAL_TITLE);
 		firstStage.setScene(new Scene(new StackPane(setBackground(firstStage), createBottomTitle(title))));
-		firstStage.getScene().getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+		firstStage.getScene().getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
 		firstStage.show();
 		animationTitle(title);
+
+
 
 	}
 
@@ -69,7 +71,7 @@ public class Home{
 
 	public Region setBackground(Stage stage) {
 
-		Image sfondo = new Image(getClass().getResource("Sfondo2.jpg").toExternalForm());
+		Image sfondo = new Image(getClass().getResource("/images/Sfondo2.jpg").toExternalForm());
 		Region contenuto = new Region();
 
 		BackgroundImage sfondoImage = new BackgroundImage(sfondo,

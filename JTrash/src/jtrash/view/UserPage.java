@@ -72,13 +72,13 @@ public class UserPage {
 		HBox avatarSection = new HBox(15); // Imposta lo spazio tra gli avatar
 
 		// Creazione degli avatar come esempio (immagini fittizie)
-		ImageView avatar1 = new ImageView(new Image(getClass().getResource("donna.jpg").toExternalForm()));
+		ImageView avatar1 = new ImageView(new Image(getClass().getResource("/images/donna.jpg").toExternalForm()));
 		avatar1.setFitWidth(50);
 		avatar1.setFitHeight(50);
-		ImageView avatar2 = new ImageView(new Image(getClass().getResource("occhialetto.jpg").toExternalForm()));
+		ImageView avatar2 = new ImageView(new Image(getClass().getResource("/images/occhialetto.jpg").toExternalForm()));
 		avatar2.setFitWidth(50);
 		avatar2.setFitHeight(50);
-		ImageView avatar3 = new ImageView(new Image(getClass().getResource("9440461.jpg").toExternalForm()));
+		ImageView avatar3 = new ImageView(new Image(getClass().getResource("/images/9440461.jpg").toExternalForm()));
 		avatar3.setFitWidth(50);
 		avatar3.setFitHeight(50);
 
