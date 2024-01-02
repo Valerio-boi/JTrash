@@ -18,6 +18,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import utility.Constants;
 
 public class UserPage {
 
@@ -43,42 +44,41 @@ public class UserPage {
 		//	    VBox vboxRegistrazione = new VBox();
 		//	    vboxRegistrazione.setAlignment(Pos.CENTER);
 
-		Label titleRegistrazione = new Label("Registrazione");
-		titleRegistrazione.setFont(Font.font("Arial", FontWeight.BOLD, 30));
-		titleRegistrazione.setStyle("-fx-text-fill: linear-gradient(to bottom, #FF00FF, #007BA7);");
+		Label titleRegistrazione = new Label(Constants.Label.REGISTRA);
+		titleRegistrazione.setFont(Font.font(Constants.Font.ARIAL_FONT, FontWeight.BOLD, 30));
+		titleRegistrazione.setStyle(Constants.Css.BOLD_CLASSIC);
 		formPane.add(titleRegistrazione, 0, 0, 2, 1); 
 
 
-		// Aggiunta dei campi del form
-		Label nomeLabel = new Label("Nome:");
-		nomeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: linear-gradient(to bottom, #FF00FF, #007BA7);");
+		Label nomeLabel = new Label(Constants.Label.NOME);
+		nomeLabel.setStyle(Constants.Css.BOLD_CLASSIC);
 		TextField nomeField = new TextField();
-		nomeField.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #ccc; -fx-border-radius: 5px; -fx-padding: 5px;");
+		nomeField.setStyle(Constants.Css.STYLE_FIELD);
 
-		Label cognomeLabel = new Label("Cognome:");
-		cognomeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: linear-gradient(to bottom, #FF00FF, #007BA7);");
+		Label cognomeLabel = new Label(Constants.Label.COGNOME);
+		cognomeLabel.setStyle(Constants.Css.BOLD_CLASSIC);
 		TextField cognomeField = new TextField();
-		cognomeField.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #ccc; -fx-border-radius: 5px; -fx-padding: 5px;");
+		cognomeField.setStyle(Constants.Css.STYLE_FIELD);
 
-		Label dataDiNascitaLabel = new Label("Data di Nascita:");
-		dataDiNascitaLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: linear-gradient(to bottom, #FF00FF, #007BA7);");
+		Label dataDiNascitaLabel = new Label(Constants.Label.DATA_NASCITA);
+		dataDiNascitaLabel.setStyle(Constants.Css.BOLD_CLASSIC);
 		DatePicker dataDiNascitaPicker = new DatePicker();
 		
-		Label nicknameLabel = new Label("Nickname:");
-		nicknameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: linear-gradient(to bottom, #FF00FF, #007BA7);");
+		Label nicknameLabel = new Label(Constants.Label.NICKNAME);
+		nicknameLabel.setStyle(Constants.Css.BOLD_CLASSIC);
 		TextField nicknameField = new TextField();
-		nicknameField.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #ccc; -fx-border-radius: 5px; -fx-padding: 5px;");
+		nicknameField.setStyle(Constants.Css.STYLE_FIELD);
 
 		HBox avatarSection = new HBox(15); // Imposta lo spazio tra gli avatar
 
 		// Creazione degli avatar come esempio (immagini fittizie)
-		ImageView avatar1 = new ImageView(new Image(getClass().getResource("/images/donna.jpg").toExternalForm()));
+		ImageView avatar1 = new ImageView(new Image(getClass().getResource(Constants.Path.DONNA).toExternalForm()));
 		avatar1.setFitWidth(50);
 		avatar1.setFitHeight(50);
-		ImageView avatar2 = new ImageView(new Image(getClass().getResource("/images/occhialetto.jpg").toExternalForm()));
+		ImageView avatar2 = new ImageView(new Image(getClass().getResource(Constants.Path.OCCHIALETTO).toExternalForm()));
 		avatar2.setFitWidth(50);
 		avatar2.setFitHeight(50);
-		ImageView avatar3 = new ImageView(new Image(getClass().getResource("/images/9440461.jpg").toExternalForm()));
+		ImageView avatar3 = new ImageView(new Image(getClass().getResource(Constants.Path.CAPELLONE).toExternalForm()));
 		avatar3.setFitWidth(50);
 		avatar3.setFitHeight(50);
 
@@ -87,12 +87,12 @@ public class UserPage {
 		
 		HBox buttonSection = new HBox(15);
 		
-		Button registraButton = new Button("Registra");
-		registraButton.setStyle("-fx-background-color: linear-gradient(to bottom, #FF00FF, #007BA7); -fx-text-fill: white;");
+		Button registraButton = new Button(Constants.Label.BUTTON_REGISTRA);
+		registraButton.setStyle(Constants.Css.CLASSIC_CSS_TEXT);
 		registraButton.setOnAction(e -> handleRegistra()); // Aggiungi l'handler appropriato per il bottone "Registra"
 
-		Button tornaHomeButton = new Button("Torna alla Home");
-		tornaHomeButton.setStyle("-fx-background-color: linear-gradient(to bottom, #FF00FF, #007BA7); -fx-text-fill: white;");
+		Button tornaHomeButton = new Button(Constants.Label.HOME);
+		tornaHomeButton.setStyle(Constants.Css.CLASSIC_CSS_TEXT);
 		tornaHomeButton.setOnAction(e -> handleTornaHome()); // Aggiungi l'handler appropriato per il bottone "Torna alla Home"
 
 		buttonSection.getChildren().addAll(registraButton, tornaHomeButton);

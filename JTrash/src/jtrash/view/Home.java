@@ -29,14 +29,14 @@ public class Home{
 	public void home(Stage firstStage) {
 		
 		this.stage = firstStage;
-		Text title = new Text("JTrash Game");
+		Text title = new Text(Constants.Title.GAME_TITLE);
        
 		firstStage.setWidth(Screen.getPrimary().getBounds().getWidth());
 		firstStage.setHeight(Screen.getPrimary().getBounds().getHeight());
 		firstStage.setResizable(true);
 		firstStage.setTitle(Constants.Title.INITIAL_TITLE);
 		firstStage.setScene(new Scene(new StackPane(setBackground(firstStage), createBottomTitle(title))));
-		firstStage.getScene().getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+		firstStage.getScene().getStylesheets().add(getClass().getResource(Constants.Path.CSS).toExternalForm());
 		firstStage.show();
 		animationTitle(title);
 
@@ -47,9 +47,9 @@ public class Home{
 
 	private VBox homeButton() {
 
-		Button gioca = new Button("Gioca");
-		Button opzioni = new Button("Risoluzione");
-		Button tornaDesktop = new Button("Torna al desktop");
+		Button gioca = new Button(Constants.Label.GIOCA);
+		Button opzioni = new Button(Constants.Label.RISOLUZIONE);
+		Button tornaDesktop = new Button(Constants.Label.DESKTOP);
 		
 		UserPage userPage = new UserPage();
 		gioca.setOnAction(e -> userPage.userPageShow(stage));
@@ -71,7 +71,7 @@ public class Home{
 
 	public Region setBackground(Stage stage) {
 
-		Image sfondo = new Image(getClass().getResource("/images/Sfondo2.jpg").toExternalForm());
+		Image sfondo = new Image(getClass().getResource(Constants.Path.BACKGROUND).toExternalForm());
 		Region contenuto = new Region();
 
 		BackgroundImage sfondoImage = new BackgroundImage(sfondo,
@@ -89,11 +89,11 @@ public class Home{
 	
 	private BorderPane createBottomTitle(Text title) {
 	    title.setFont(Font.font("Arial", FontWeight.BOLD, 50));
-	    title.setStyle("-fx-fill: linear-gradient(to bottom, #FF00FF, #007BA7);");
+	    title.setStyle(Constants.Css.CLASSIC_CSS);
 
-	    Text creatorInfo = new Text("Creato da Valerio Boi, Matricola: 2091079");
-	    creatorInfo.setFont(Font.font("Arial", 35)); 
-	    creatorInfo.setStyle("-fx-fill: linear-gradient(to bottom, #FF00FF, #007BA7);");
+	    Text creatorInfo = new Text(Constants.Label.CREATORE);
+	    creatorInfo.setFont(Font.font(Constants.Font.ARIAL_FONT, 35)); 
+	    creatorInfo.setStyle(Constants.Css.CLASSIC_CSS);
 	    
 	    VBox button = homeButton();
 
