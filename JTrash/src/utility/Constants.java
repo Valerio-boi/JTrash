@@ -35,7 +35,12 @@ public class Constants {
 		public static final String NICKNAME = "Nickname:";
 		public static final String CONFERMA = "Conferma";
 		public static final String RISOLUZIONE_DESIDERATA = "Seleziona la resoluzione desiderata";
-		
+		public static final String RIS_1920 = "1920x1080";
+		public static final String RIS_1280 = "1280x720"; 
+		public static final String RIS_1366 = "1366x768";
+		public static final String RIS_1024 = "1024x768";
+		public static final String RIS_800  = "800x600";
+
 	}
 	
 	public class Css {
@@ -44,7 +49,7 @@ public class Constants {
 		public static final String CLASSIC_CSS_TEXT = "-fx-background-color: linear-gradient(to bottom, #FF00FF, #007BA7); -fx-text-fill: white;";
 		public static final String BOLD_CLASSIC = "-fx-font-weight: bold; -fx-text-fill: linear-gradient(to bottom, #FF00FF, #007BA7);";
 		public static final String STYLE_FIELD = "-fx-background-color: #f5f5f5; -fx-border-color: #ccc; -fx-border-radius: 5px; -fx-padding: 5px;";
-		
+		public static final String STYLE_DIALOG = "-fx-background-color: #333333; -fx-font-size: 18px;";
 	}
 	
 	public class Font {
