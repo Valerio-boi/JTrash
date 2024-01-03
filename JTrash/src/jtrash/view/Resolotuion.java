@@ -16,6 +16,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import utility.Constants;
 
 public class Resolotuion {
 
@@ -89,7 +90,7 @@ public class Resolotuion {
 	
 	private void setStyle(ButtonType buttonType) {
 		Button button = (Button) alert.getDialogPane().lookupButton(buttonType);
-		button.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+		button.getStylesheets().add(getClass().getResource(Constants.Path.CSS).toExternalForm());
 	}
 
 
