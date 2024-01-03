@@ -33,7 +33,8 @@ public class Constants {
 		public static final String COGNOME = "Cognome:";
 		public static final String DATA_NASCITA = "Data di nascita:";
 		public static final String NICKNAME = "Nickname:";
-		
+		public static final String CONFERMA = "Conferma";
+		public static final String RISOLUZIONE_DESIDERATA = "Seleziona la resoluzione desiderata";
 		
 	}
 	

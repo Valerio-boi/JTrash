@@ -25,11 +25,11 @@ public class Resolotuion {
 	public void mostraDialogoOpzioni(Stage stage) {
 		alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle(""); 
-		alert.setHeaderText("Conferma"); 
+		alert.setHeaderText(Constants.Label.CONFERMA); 
 
-		Label header = new Label("Seleziona la resoluzione desiderata");
-		header.setFont(Font.font("Arial", FontWeight.BOLD, 25)); 
-		header.setStyle("-fx-text-fill: linear-gradient(to bottom, #FF00FF, #007BA7);"); 
+		Label header = new Label(Constants.Label.RISOLUZIONE_DESIDERATA);
+		header.setFont(Font.font(Constants.Font.ARIAL_FONT, FontWeight.BOLD, 25)); 
+		header.setStyle(Constants.Css.CLASSIC_CSS); 
 
 		alert.getDialogPane().setHeaderText(null); 
 		alert.getDialogPane().setGraphic(null); 
@@ -41,11 +41,11 @@ public class Resolotuion {
 		content.getChildren().addAll(header);
 		alert.getDialogPane().setContent(content);
 
-		ButtonType resolution1 = new ButtonType("1920x1080");
-		ButtonType resolution2 = new ButtonType("1280x720");
-		ButtonType resolution3 = new ButtonType("1366x768");
-		ButtonType resolution4 = new ButtonType("1024x768");
-		ButtonType resolution5 = new ButtonType("800x600");
+		ButtonType resolution1 = new ButtonType(Constants.Label.RIS_1920);
+		ButtonType resolution2 = new ButtonType(Constants.Label.RIS_1280);
+		ButtonType resolution3 = new ButtonType(Constants.Label.RIS_1366);
+		ButtonType resolution4 = new ButtonType(Constants.Label.RIS_1024);
+		ButtonType resolution5 = new ButtonType(Constants.Label.RIS_800);
 
 		ButtonType cancel = new ButtonType("Annulla", ButtonData.CANCEL_CLOSE);
 		
@@ -60,9 +60,7 @@ public class Resolotuion {
 		setStyle(cancel);
 		
 		DialogPane dialogPane = alert.getDialogPane();
-		dialogPane.setStyle(
-				"-fx-background-color: #333333; " +
-				"-fx-font-size: 18px;");
+		dialogPane.setStyle(Constants.Css.STYLE_DIALOG);
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.isPresent()) {	    	
