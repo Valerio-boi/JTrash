@@ -12,6 +12,8 @@ import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import jtrash.model.User;
 import jtrash.view.Home;
@@ -24,26 +26,31 @@ public class UserController {
 	
 	
 	public void handleRegistra(User user) {
+		
+		List<User> listaUser;
+		listaUser = leggiUtenteDaFile();
+		listaUser.add(user);
 	    try {
 	        // Serializzazione dell'oggetto User
 	        try (FileOutputStream fileOut = new FileOutputStream("/Users/valerio/eclipse/Workspace/Trash/JTrash/resources/persistence/user.txt");
 	             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-	            out.writeObject(user);
+	            out.writeObject(listaUser);
 	        }
 	    } catch (IOException e) {
 	        e.printStackTrace();
 	    }
 	    
 	    System.out.println("Test funzionamento:");
-	    User leggo = leggiUtenteDaFile();
-	    System.out.println(leggo.toString());
+	    for(User iter: listaUser) {
+	    	System.out.println(iter.toString());
+	    }
 	}
 	
-	public User leggiUtenteDaFile() {
-	    User user = null;
+	public List<User> leggiUtenteDaFile() {
+	    List<User> user = new ArrayList<User>();
 	    try (FileInputStream fileIn = new FileInputStream("/Users/valerio/eclipse/Workspace/Trash/JTrash/resources/persistence/user.txt");
 	         ObjectInputStream in = new ObjectInputStream(fileIn)) {
-	        user = (User) in.readObject();
+	        user = (List<User>) in.readObject();
 	    } catch (IOException | ClassNotFoundException e) {
 	        e.printStackTrace();
 	    }
