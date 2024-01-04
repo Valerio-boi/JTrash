@@ -39,11 +39,6 @@ public class UserController {
 	    } catch (IOException e) {
 	        e.printStackTrace();
 	    }
-	    
-	    System.out.println("Test funzionamento:");
-	    for(User iter: listaUser) {
-	    	System.out.println(iter.toString());
-	    }
 	}
 	
 	public List<User> leggiUtenteDaFile() {

@@ -1,11 +1,19 @@
 package jtrash.view;
 
+import java.time.LocalDate;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -34,11 +42,11 @@ public class UserPage {
 
 		Home home = new Home();
 		home.setBackground(stage);
-		stage.setScene(new Scene(new StackPane(home.setBackground(stage),caricaNuovoContenuto())));
+		stage.setScene(new Scene(new StackPane(home.setBackground(stage),createContent())));
 	}
 
 
-	private GridPane caricaNuovoContenuto() {
+	private GridPane createRegistrazionForm() {
 		// Creazione del form a sinistra
 		GridPane formPane = new GridPane();
 		formPane.setHgap(60);
@@ -134,15 +142,115 @@ public class UserPage {
 		contenuto.setHgap(20);
 		contenuto.add(formPane, 0, 0);
 		//	    contenuto.add(titoloUtentiCreati, 1, 0);
-
+		
 		return contenuto;
 
+	}
+	
+	private VBox createContent() {
+	    VBox content = new VBox();
+	    content.setSpacing(140);
+	    content.setPadding(new Insets(30));
+
+	    GridPane formPane = createRegistrazionForm(); // Metodo per creare il form di registrazione
+
+	    TableView<User> tableView = createTable(); // Metodo per creare la tabella
+
+	    content.getChildren().addAll(formPane, tableView);
+	    
+	    return content;
+	}
+	
+	
+	private TableView createTable() {
+		
+		TableView<User> tableView = new TableView<>();
+		ObservableList<User> userList = FXCollections.observableArrayList();
+
+		TableColumn<User, String> nomeColumn = new TableColumn<>("Nome");
+		nomeColumn.setCellValueFactory(new PropertyValueFactory<>("nome"));
+		adaptColumnTable(nomeColumn);
+		
+		TableColumn<User, String> cognomeColumn = new TableColumn<>("Cognome");
+		cognomeColumn.setCellValueFactory(new PropertyValueFactory<>("cognome"));
+		adaptColumnTable(cognomeColumn);
+
+		TableColumn<User, LocalDate> dataNascitaColumn = new TableColumn<>("Data di nascita");
+		dataNascitaColumn.setCellValueFactory(new PropertyValueFactory<>("dataDiNascita"));
+		dataNascitaColumn.setMinWidth(100);
+		dataNascitaColumn.setPrefWidth(150);
+		
+		TableColumn<User, String> nicknameColumn = new TableColumn<>("Nickname");
+		nicknameColumn.setCellValueFactory(new PropertyValueFactory<>("nickname"));
+		adaptColumnTable(nicknameColumn);
+		tableView.setStyle("-fx-padding: 0;");
+		
+		TableColumn<User, Void> eliminaColumn = new TableColumn<>("Elimina");
+		eliminaColumn.setCellFactory(param -> {
+		    Button eliminaButton = new Button("Elimina");
+		    TableCell<User, Void> cell = new TableCell<>() {
+		        @Override
+		        protected void updateItem(Void item, boolean empty) {
+		            super.updateItem(item, empty);
+		            if (empty) {
+		                setGraphic(null);
+		                setText(null);
+		            } else {
+		                eliminaButton.setOnAction(event -> {
+		                    User user = getTableView().getItems().get(getIndex());
+		                    // Logica per eliminare l'utente dalla tabella e dal file
+		                    // userController.handleElimina(user);
+		                });
+		                setGraphic(eliminaButton);
+		                setText(null);
+		            }
+		        }
+		    };
+		    return cell;
+		});
+
+		TableColumn<User, Void> modificaColumn = new TableColumn<>("Modifica");
+		modificaColumn.setCellFactory(param -> {
+		    Button modificaButton = new Button("Modifica");
+		    TableCell<User, Void> cell = new TableCell<>() {
+		        @Override
+		        protected void updateItem(Void item, boolean empty) {
+		            super.updateItem(item, empty);
+		            if (empty) {
+		                setGraphic(null);
+		                setText(null);
+		            } else {
+		                modificaButton.setOnAction(event -> {
+		                    User user = getTableView().getItems().get(getIndex());
+		                    // Logica per modificare l'utente
+		                    // userController.handleModifica(user);
+		                });
+		                setGraphic(modificaButton);
+		                setText(null);
+		            }
+		        }
+		    };
+		    return cell;
+		});
+		
+		
+		tableView.getColumns().addAll(nomeColumn, cognomeColumn, dataNascitaColumn, nicknameColumn, eliminaColumn, modificaColumn);
+		
+		userList.addAll(userController.leggiUtenteDaFile());
+		tableView.setItems(userList);
+		
+		return tableView;
 	}
 	
 	public void registra() {
 		User user = new User(nomeField.getText(), cognomeField.getText(), nicknameField.getText(), dataDiNascitaPicker.getValue());
 		userController.handleRegistra(user);
 		
+	}
+	
+	private void adaptColumnTable(TableColumn<User, String> nomeColumn) {
+		nomeColumn.setMinWidth(100);
+		nomeColumn.setPrefWidth(150);
 	}
 
 }
