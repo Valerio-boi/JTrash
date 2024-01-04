@@ -18,6 +18,7 @@ import javafx.scene.control.Button;
 public class Modal {
 
 
+	//TODO: IMPOSTARE LE COSTANTI
 	public void mostraDialogoConferma() {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle(""); 
@@ -50,9 +51,7 @@ public class Modal {
 		cancelButton.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 
 		DialogPane dialogPane = alert.getDialogPane();
-		dialogPane.setStyle(
-				"-fx-background-color: #333333; " +
-				"-fx-font-size: 18px;");
+		dialogPane.setStyle("-fx-background-color: #333333; -fx-font-size: 18px;");
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.isPresent() && result.get() == ButtonType.OK){

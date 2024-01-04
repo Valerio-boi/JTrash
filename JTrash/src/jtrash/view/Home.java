@@ -113,6 +113,8 @@ public class Home{
 	      transition.setToX(0);
 	      transition.play();
 	}
+
+
 	
 
 }

@@ -7,7 +7,7 @@ public class Constants {
 		
 		public static final String INITIAL_TITLE = "JTrash";
 		public static final String GAME_TITLE = "JTrash Game";
-		
+
 	}
 	
 	public class Path {
@@ -17,6 +17,7 @@ public class Constants {
 		public static final String OCCHIALETTO = "/images/occhialetto.jpg";
 		public static final String CAPELLONE = "/images/capellone.jpg";
 		public static final String BACKGROUND = "/images/background.jpg";
+		public static final String PERSISTENCE_USER = "/persistence/user.ser";
 		
 	}
 	

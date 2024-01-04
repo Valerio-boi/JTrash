@@ -1,8 +1,6 @@
 package jtrash.view;
 
-import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
@@ -17,11 +15,17 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import javafx.util.Duration;
+import jtrash.controller.UserController;
+import jtrash.model.User;
 import utility.Constants;
 
 public class UserPage {
 
+	private UserController userController;
+	private TextField nomeField;
+	private TextField cognomeField;
+	private TextField nicknameField;
+	private DatePicker dataDiNascitaPicker;
 
 	public void userPageShow(Stage stage) {
 		VBox nuovoContenuto = new VBox();
@@ -52,25 +56,29 @@ public class UserPage {
 
 		Label nomeLabel = new Label(Constants.Label.NOME);
 		nomeLabel.setStyle(Constants.Css.BOLD_CLASSIC);
-		TextField nomeField = new TextField();
+		nomeField = new TextField();
 		nomeField.setStyle(Constants.Css.STYLE_FIELD);
 
 		Label cognomeLabel = new Label(Constants.Label.COGNOME);
 		cognomeLabel.setStyle(Constants.Css.BOLD_CLASSIC);
-		TextField cognomeField = new TextField();
+		cognomeField = new TextField();
 		cognomeField.setStyle(Constants.Css.STYLE_FIELD);
 
 		Label dataDiNascitaLabel = new Label(Constants.Label.DATA_NASCITA);
 		dataDiNascitaLabel.setStyle(Constants.Css.BOLD_CLASSIC);
-		DatePicker dataDiNascitaPicker = new DatePicker();
+		dataDiNascitaPicker = new DatePicker();
 		
 		Label nicknameLabel = new Label(Constants.Label.NICKNAME);
 		nicknameLabel.setStyle(Constants.Css.BOLD_CLASSIC);
-		TextField nicknameField = new TextField();
+		nicknameField = new TextField();
 		nicknameField.setStyle(Constants.Css.STYLE_FIELD);
-
 		HBox avatarSection = new HBox(15); // Imposta lo spazio tra gli avatar
 
+		//Setto lo user per la logica del controller 
+		User user = new User(nomeField.getText(), cognomeField.getText(), nicknameField.getText(), dataDiNascitaPicker.getValue());
+
+		
+		
 		// Creazione degli avatar come esempio (immagini fittizie)
 		ImageView avatar1 = new ImageView(new Image(getClass().getResource(Constants.Path.DONNA).toExternalForm()));
 		avatar1.setFitWidth(50);
@@ -87,13 +95,15 @@ public class UserPage {
 		
 		HBox buttonSection = new HBox(15);
 		
+		this.userController = new UserController();
+		
 		Button registraButton = new Button(Constants.Label.BUTTON_REGISTRA);
 		registraButton.setStyle(Constants.Css.CLASSIC_CSS_TEXT);
-		registraButton.setOnAction(e -> handleRegistra()); // Aggiungi l'handler appropriato per il bottone "Registra"
+		registraButton.setOnAction(e -> registra()); // Aggiungi l'handler appropriato per il bottone "Registra"
 
 		Button tornaHomeButton = new Button(Constants.Label.HOME);
 		tornaHomeButton.setStyle(Constants.Css.CLASSIC_CSS_TEXT);
-		tornaHomeButton.setOnAction(e -> handleTornaHome()); // Aggiungi l'handler appropriato per il bottone "Torna alla Home"
+		tornaHomeButton.setOnAction(e -> userController.handleTornaHome()); // Aggiungi l'handler appropriato per il bottone "Torna alla Home"
 
 		buttonSection.getChildren().addAll(registraButton, tornaHomeButton);
 
@@ -125,16 +135,13 @@ public class UserPage {
 		contenuto.add(formPane, 0, 0);
 		//	    contenuto.add(titoloUtentiCreati, 1, 0);
 
-
 		return contenuto;
 
 	}
 	
-	private void handleRegistra() {
-		
-	}
-	
-	private void handleTornaHome() {
+	public void registra() {
+		User user = new User(nomeField.getText(), cognomeField.getText(), nicknameField.getText(), dataDiNascitaPicker.getValue());
+		userController.handleRegistra(user);
 		
 	}
 

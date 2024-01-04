@@ -1,14 +1,29 @@
 package jtrash.model;
 
-import java.util.Date;
+import java.io.Serializable;
+import java.time.LocalDate;
 
-public class User {
 
+public class User implements Serializable{
+
+	private static final long serialVersionUID = 4598207288789573868L;
+	
 	private String nome;
 	private String cognome;
 	private String nickname;
-	private Date dataNascita;
+	private LocalDate dataNascita;
 	private Integer livello;
+	
+	
+	public User() {}
+	
+	public User(String nome, String cognome, String nickname, LocalDate dataNascita) {
+		super();
+		this.nome = nome;
+		this.cognome = cognome;
+		this.nickname = nickname;
+		this.dataNascita = dataNascita;
+	}
 	
 	
 	public String getNome() {
@@ -29,10 +44,10 @@ public class User {
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
-	public Date getDataNascita() {
+	public LocalDate getDataNascita() {
 		return dataNascita;
 	}
-	public void setDataNascita(Date dataNascita) {
+	public void setDataNascita(LocalDate dataNascita) {
 		this.dataNascita = dataNascita;
 	}
 	public Integer getLivello() {

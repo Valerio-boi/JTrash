@@ -7,6 +7,7 @@ import jtrash.view.Home;
 public class JTrashController extends Application{
 	
     private Home home;
+    static Stage stage;
     
     @Override
     public void init() throws Exception {
@@ -18,7 +19,7 @@ public class JTrashController extends Application{
     }
 
 	public void start(Stage stage){
-    	
+    	this.stage = stage;
     	home.home(stage);
     	
     }

@@ -16,11 +16,13 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import jtrash.controller.ResolutionController;
 import utility.Constants;
 
 public class Resolotuion {
 
 	private Alert alert;
+	private ResolutionController resolutionController;
 
 	public void mostraDialogoOpzioni(Stage stage) {
 		alert = new Alert(AlertType.CONFIRMATION);
@@ -63,28 +65,12 @@ public class Resolotuion {
 		dialogPane.setStyle(Constants.Css.STYLE_DIALOG);
 
 		Optional<ButtonType> result = alert.showAndWait();
-		if (result.isPresent()) {	    	
-			if (result.get() == resolution1) {
-				impostaRisoluzione(1920, 1080, stage);
-			}else if (result.get() == resolution2) {
-				impostaRisoluzione(1280, 720, stage);
-			}else if (result.get() == resolution3) {
-				impostaRisoluzione(1366, 768, stage);
-			}else if (result.get() == resolution4) {
-				impostaRisoluzione(1024, 768, stage);
-			}else if (result.get() == resolution5) {
-				impostaRisoluzione(800, 600, stage);
-			}
-		}
+		resolutionController = new ResolutionController();
+		resolutionController.setRisoluzione(result, stage);
 		
-
+		
 	}
 
-	public void impostaRisoluzione(double width, double height, Stage stage) {
-		stage.setWidth(width);
-		stage.setHeight(height);
-		stage.setFullScreen(false);
-	}
 	
 	private void setStyle(ButtonType buttonType) {
 		Button button = (Button) alert.getDialogPane().lookupButton(buttonType);
