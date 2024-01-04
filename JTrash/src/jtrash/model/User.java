@@ -12,7 +12,7 @@ public class User implements Serializable{
 	private String cognome;
 	private String nickname;
 	private LocalDate dataNascita;
-	private Integer livello;
+	private Integer livello=1;
 	
 	
 	public User() {}
