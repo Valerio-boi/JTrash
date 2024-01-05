@@ -17,6 +17,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
@@ -149,16 +150,45 @@ public class UserPage {
 	
 	private VBox createContent() {
 	    VBox content = new VBox();
-	    content.setSpacing(140);
-	    content.setPadding(new Insets(30));
+	    content.setSpacing(20);
+	    content.setPadding(new Insets(20));
 
-	    GridPane formPane = createRegistrazionForm(); // Metodo per creare il form di registrazione
+	    GridPane registrazionePane = createRegistrazionForm(); // Form di registrazione
 
-	    TableView<User> tableView = createTable(); // Metodo per creare la tabella
+	    // Creazione delle due sezioni vuote "Selezione Giocatore" e "Classifica"
+	    GridPane sezioneGiocatorePane = createEmptySection("Selezione Giocatore");
+	    GridPane classificaPane = createEmptySection("Classifica");
+	    TableView<String> table = createTable();
 
-	    content.getChildren().addAll(formPane, tableView);
+	    // Aggiungi le tre sezioni affiancate (registrazione a sinistra, sezione giocatore e classifica a destra)
+	    GridPane layoutPane = new GridPane();
+	    layoutPane.setHgap(20);
+	    layoutPane.add(registrazionePane, 0, 0);
+	    layoutPane.add(sezioneGiocatorePane, 1, 0);
+	    layoutPane.add(classificaPane, 2, 0);
 	    
+	    spazivuoti(layoutPane);
+	    layoutPane.add(table, 0, 10, 2, 1); 
+	    content.getChildren().add(layoutPane);
+
 	    return content;
+	}
+	
+	private GridPane createEmptySection(String sectionTitle) {
+	    GridPane sectionPane = new GridPane();
+	    sectionPane.setPadding(new Insets(20));
+//	    sectionPane.setStyle("-fx-border-color: white; -fx-border-width: 1px;"); // Aggiungi una bordatura per visualizzare l'area
+
+	    Label titleLabel = new Label(sectionTitle);
+	    titleLabel.setFont(Font.font(Constants.Font.ARIAL_FONT, FontWeight.BOLD, 30));
+	    titleLabel.setStyle(Constants.Css.BOLD_CLASSIC);
+	    
+
+	    // Aggiungi altri componenti o layout a questa sezione
+
+	    sectionPane.add(titleLabel, 0, 0);
+
+	    return sectionPane;
 	}
 	
 	
@@ -166,6 +196,9 @@ public class UserPage {
 		
 		TableView<User> tableView = new TableView<>();
 		ObservableList<User> userList = FXCollections.observableArrayList();
+		
+		tableView.setFixedCellSize(30); // Imposta l'altezza fissa per ogni riga
+	    tableView.prefHeightProperty().bind(tableView.fixedCellSizeProperty().multiply(6.1));
 
 		TableColumn<User, String> nomeColumn = new TableColumn<>("Nome");
 		nomeColumn.setCellValueFactory(new PropertyValueFactory<>("nome"));
@@ -176,7 +209,7 @@ public class UserPage {
 		adaptColumnTable(cognomeColumn);
 
 		TableColumn<User, LocalDate> dataNascitaColumn = new TableColumn<>("Data di nascita");
-		dataNascitaColumn.setCellValueFactory(new PropertyValueFactory<>("dataDiNascita"));
+		dataNascitaColumn.setCellValueFactory(new PropertyValueFactory<>("dataNascita"));
 		dataNascitaColumn.setMinWidth(100);
 		dataNascitaColumn.setPrefWidth(150);
 		
@@ -251,6 +284,16 @@ public class UserPage {
 	private void adaptColumnTable(TableColumn<User, String> nomeColumn) {
 		nomeColumn.setMinWidth(100);
 		nomeColumn.setPrefWidth(150);
+	}
+	
+	private void spazivuoti(GridPane layoutPane) {
+	    layoutPane.add(new Label(""), 0, 3); // Questo aggiunge una riga vuota tra il form e la tabella
+	    layoutPane.add(new Label(""), 0, 4); 
+	    layoutPane.add(new Label(""), 0, 5); 
+	    layoutPane.add(new Label(""), 0, 6); 
+	    layoutPane.add(new Label(""), 0, 7); 
+	    layoutPane.add(new Label(""), 0, 8); 
+	    layoutPane.add(new Label(""), 0, 9); 
 	}
 
 }
