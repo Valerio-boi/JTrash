@@ -13,6 +13,7 @@ public class Constants {
 	public class Path {
 		
 		public static final String CSS = "/css/style.css";
+		public static final String CSS_DIALOG = "/css/dialogButtons.css";
 		public static final String DONNA = "/images/donna.jpg";
 		public static final String OCCHIALETTO = "/images/occhialetto.jpg";
 		public static final String CAPELLONE = "/images/capellone.jpg";

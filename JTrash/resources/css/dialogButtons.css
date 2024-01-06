@@ -1,0 +1,11 @@
+.button-ok {
+    -fx-background-color: #4CAF50; /* Colore verde */
+    -fx-background-radius: 20; /* Bordo arrotondato */
+    -fx-text-fill: white; /* Colore del testo */
+}
+
+.button-cancel {
+    -fx-background-color: #FF0000; /* Colore rosso */
+    -fx-background-radius: 20; /* Bordo arrotondato */
+    -fx-text-fill: white; /* Colore del testo */
+}
