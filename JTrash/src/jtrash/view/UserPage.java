@@ -1,10 +1,14 @@
 package jtrash.view;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
@@ -15,6 +19,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -35,6 +40,8 @@ public class UserPage {
 	private TextField cognomeField;
 	private TextField nicknameField;
 	private DatePicker dataDiNascitaPicker;
+	private ObservableList<User> userList;
+	private TableView<User> tableView;
 
 	public void userPageShow(Stage stage) {
 		VBox nuovoContenuto = new VBox();
@@ -156,7 +163,7 @@ public class UserPage {
 	    GridPane registrazionePane = createRegistrazionForm(); // Form di registrazione
 
 	    // Creazione delle due sezioni vuote "Selezione Giocatore" e "Classifica"
-	    GridPane sezioneGiocatorePane = createEmptySection("Selezione Giocatore");
+	    GridPane sezioneGiocatorePane = createPlayersSection("Selezione giocatore");
 	    GridPane classificaPane = createEmptySection("Classifica");
 	    TableView<String> table = createTable();
 
@@ -168,7 +175,26 @@ public class UserPage {
 	    layoutPane.add(classificaPane, 2, 0);
 	    
 	    spazivuoti(layoutPane);
-	    layoutPane.add(table, 0, 10, 2, 1); 
+	    
+	    tableView.setMaxSize(760, 400); // Imposta una dimensione massima per la tabella
+	    tableView.setPrefWidth(600); 
+	    
+	    VBox tableWrapper = new VBox(); // Wrapper per la tabella
+	    tableWrapper.getChildren().add(table);
+	    tableWrapper.setAlignment(Pos.CENTER); 
+	    
+	    layoutPane.add(tableWrapper, 0, 10, 3, 1); // Modifica qui per distribuire la tabella su 3 colonne
+	    
+	    VBox.setVgrow(layoutPane, Priority.ALWAYS);
+	    // Aggiungo 3 colonne per distribuire lo spazio uniformemente
+	    ColumnConstraints column1 = new ColumnConstraints();
+	    column1.setPercentWidth(33.33);
+	    ColumnConstraints column2 = new ColumnConstraints();
+	    column2.setPercentWidth(33.33);
+	    ColumnConstraints column3 = new ColumnConstraints();
+	    column3.setPercentWidth(33.33);
+	    layoutPane.getColumnConstraints().addAll(column1, column2, column3);
+
 	    content.getChildren().add(layoutPane);
 
 	    return content;
@@ -191,11 +217,53 @@ public class UserPage {
 	    return sectionPane;
 	}
 	
+	private GridPane createPlayersSection(String title) {
+	    GridPane playersSection = new GridPane();
+	    playersSection.setPadding(new Insets(30));
+	    playersSection.setVgap(15);
+
+	    Label titleLabel = new Label(title);
+	    titleLabel.setFont(Font.font(Constants.Font.ARIAL_FONT, FontWeight.BOLD, 30));
+	    titleLabel.setStyle(Constants.Css.BOLD_CLASSIC);
+	    playersSection.add(titleLabel, 0, 0, 6, 1);
+
+	    List<User> userList = userController.leggiUtenteDaFile();
+	    int userNumber = 1;
+
+	    for (User user : userList) {
+	        Label userLabel = new Label(userNumber + ".");
+	        userLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #00BFFF; -fx-alignment: center; -fx-padding: 0 0 0 20;");
+
+	        Label nicknameLabel = new Label(user.getNickname());
+	        nicknameLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #00BFFF; -fx-alignment: center; -fx-padding: 0 50 0 50;");
+
+	        Button playButton = new Button("Gioca");
+	        playButton.setStyle("-fx-font-size: 16px; -fx-text-fill: #FFFFFF; -fx-background-color: #4CAF50; -fx-background-radius: 15;");
+	        playButton.setOnAction(event -> userController.handlePlay(user));
+
+	        HBox buttonBox = new HBox(playButton);
+	        buttonBox.setAlignment(Pos.CENTER_LEFT);
+
+	        playersSection.add(userLabel, 0, userNumber);
+	        playersSection.add(nicknameLabel, 1, userNumber);
+	        playersSection.add(buttonBox, 2, userNumber);
+
+	        userNumber++;
+	    }
+
+	    return playersSection;
+	}
+
+
+
+
+
+
 	
 	private TableView createTable() {
 		
-		TableView<User> tableView = new TableView<>();
-		ObservableList<User> userList = FXCollections.observableArrayList();
+		tableView = new TableView<>();
+		userList = FXCollections.observableArrayList();
 		
 		tableView.setFixedCellSize(30); // Imposta l'altezza fissa per ogni riga
 	    tableView.prefHeightProperty().bind(tableView.fixedCellSizeProperty().multiply(6.1));
@@ -231,8 +299,9 @@ public class UserPage {
 		            } else {
 		                eliminaButton.setOnAction(event -> {
 		                    User user = getTableView().getItems().get(getIndex());
-		                    // Logica per eliminare l'utente dalla tabella e dal file
-		                    // userController.handleElimina(user);
+		                    userController.handleElimina(user); // Rimuove l'utente dal file
+		                    tableView.getItems().remove(user); // Rimuove l'utente dalla tabella
+		                    userList.remove(user);
 		                });
 		                setGraphic(eliminaButton);
 		                setText(null);
@@ -277,8 +346,15 @@ public class UserPage {
 	
 	public void registra() {
 		User user = new User(nomeField.getText(), cognomeField.getText(), nicknameField.getText(), dataDiNascitaPicker.getValue());
-		userController.handleRegistra(user);
+	    userController.handleRegistra(user);
+	    userList.add(user); // Aggiungi il nuovo utente alla lista
+	    refreshTable(); 
 		
+	}
+	
+	private void refreshTable() {
+	    tableView.setItems(null); // Cancella gli elementi dalla tabella
+	    tableView.setItems(userList); // Aggiorna la tabella con la lista aggiornata
 	}
 	
 	private void adaptColumnTable(TableColumn<User, String> nomeColumn) {
