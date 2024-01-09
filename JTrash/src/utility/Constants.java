@@ -20,6 +20,7 @@ public class Constants {
 		public static final String BACKGROUND = "/images/background.jpg";
 		public static final String GAME_BACKGROUND = "/images/gameBack.jpg";
 		public static final String PERSISTENCE_USER = "/persistence/user.txt";
+		public static final String EXMPLE_CARD = "/images/card/backBlack.png";
 		
 	}
 	

@@ -1,22 +1,19 @@
 package jtrash.view;
 
-import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -39,10 +36,11 @@ import utility.Constants;
 
 public class Game {
 
-	private GridPane playersGrid;
+	private User user;
 
 	public void gamePageShow(Stage stage, User user) {
 		StackPane contenuto = new StackPane();
+		this.user = user;
 		contenuto.setAlignment(Pos.TOP_CENTER);
 
 		// Testo per il benvenuto e l'username con gradiente
@@ -77,12 +75,12 @@ public class Game {
 		Button contro3Button = createStyledButton("Contro 2", 20);
 		Button contro5Button = createStyledButton("Contro 4", 20);
 
-		contro1Button.setOnAction(e -> {});
-		contro3Button.setOnAction(e -> {});
-		contro5Button.setOnAction(e -> {});
+		contro1Button.setOnAction(e -> createGameTable(3, stage));
+		contro3Button.setOnAction(e -> createGameTable(4, stage));
+		contro5Button.setOnAction(e -> createGameTable(6, stage));
 
 
-		
+
 
 		// Layout per i bottoni
 		HBox buttonsBox = new HBox(20);
@@ -100,9 +98,126 @@ public class Game {
 		sceneCorrente.setRoot(contenuto);
 	}
 
+	public void createGameTable(int numberPlayers, Stage stage) {
+		StackPane contenuto = new StackPane();
+		contenuto.setAlignment(Pos.TOP_CENTER);
+
+		GridPane gameTable = new GridPane();
+		gameTable.setAlignment(Pos.CENTER);
+
+		int rows = numberPlayers / 2 + numberPlayers % 2;
+		int cols = 2;
+
+		// Vincoli di layout per far sì che le celle si adattino alla grandezza della finestra
+		for (int i = 0; i < rows; i++) {
+			RowConstraints rowConstraints = new RowConstraints();
+			rowConstraints.setVgrow(Priority.ALWAYS);
+			rowConstraints.setFillHeight(true);
+			gameTable.getRowConstraints().add(rowConstraints);
+		}
+		for (int i = 0; i < cols; i++) {
+			ColumnConstraints colConstraints = new ColumnConstraints();
+			colConstraints.setHgrow(Priority.ALWAYS);
+			colConstraints.setFillWidth(true);
+			gameTable.getColumnConstraints().add(colConstraints);
+		}
+
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				String playerName = "";
+				boolean pannel = true;
+				if(i==0 && j == 0){
+					playerName = user.getNickname();
+				}else if((i+1) == rows && (j+1) == cols) {
+					playerName = "Pannel control";
+					pannel = false;
+				}else {
+					playerName = "Player " + (i * cols + j + 1);
+				}
+				VBox playerArea = createPlayerArea(playerName, pannel);
+				if (i * cols + j < numberPlayers) {
+					gameTable.add(playerArea, j, i);
+				} else if (numberPlayers % 2 == 1 && j == 0) {
+					gameTable.add(new Region(), 1, i); // Aggiungi una regione vuota nella colonna 2 per centrare
+				}
+			}
+		}
+
+		contenuto.getChildren().addAll(new StackPane(setBackground(stage)), gameTable);
+
+		Scene sceneCorrente = stage.getScene();
+		sceneCorrente.setRoot(contenuto);
+	}
+
+	private VBox createPlayerArea(String playerName, boolean controllPannel) {
+		VBox playerArea = new VBox();
+		playerArea.setPrefSize(200, 200); // Imposta le dimensioni dell'area del giocatore
+		playerArea.setStyle("-fx-border-color: white; -fx-border-width: 1px;"); // Bordo per l'area del giocatore
+
+		// Label per il nickname del giocatore
+		Label nameLabel = new Label(playerName);
+		nameLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24)); // Testo più grande
+		nameLabel.setAlignment(Pos.CENTER); // Allineamento del testo al centro
+		nameLabel.setMaxWidth(Double.MAX_VALUE); // Per far sì che il testo si estenda su tutta la larghezza
+		VBox.setVgrow(nameLabel, Priority.ALWAYS); // Permette all'etichetta di espandersi verticalmente
+
+		// Applica uno stile con gradiente al testo
+		LinearGradient textGradient = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
+				new Stop(0, Color.GOLD), new Stop(1, Color.DARKORANGE));
+		nameLabel.setTextFill(textGradient);
+
+		// Animazione sul testo usando la scala
+		ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(1), nameLabel);
+		scaleTransition.setToX(1.2); // Ingrandisce il testo del 20%
+		scaleTransition.setToY(1.2); // Ingrandisce il testo del 20%
+		scaleTransition.setAutoReverse(true);
+		scaleTransition.setCycleCount(Timeline.INDEFINITE);
+		scaleTransition.play();
+
+		playerArea.setSpacing(5);
+
+		if(controllPannel) {
+			// Sezione per le carte sopra
+			HBox topCards = new HBox(20); // 20 di spazio tra le carte
+			topCards.setAlignment(Pos.CENTER);
+
+			// Aggiungi le carte sopra
+			for (int i = 0; i < 5; i++) {
+				// Aggiungi l'immagine delle carte sopra
+				ImageView cardImage = new ImageView(new Image(getClass().getResource(Constants.Path.EXMPLE_CARD).toExternalForm()));
+				// Imposta le dimensioni delle immagini delle carte
+				cardImage.setFitWidth(100); // Larghezza maggiore
+				cardImage.setFitHeight(160); // Altezza maggiore
+				topCards.getChildren().add(cardImage);
+			}
+
+			// Aggiungi spazio tra le carte sopra e sotto
+			Region space = new Region();
+			space.setPrefHeight(20); // Altezza dello spazio tra le due righe
+
+			// Sezione per le carte sotto
+			HBox bottomCards = new HBox(20); // 20 di spazio tra le carte
+			bottomCards.setAlignment(Pos.CENTER);
+
+			// Aggiungi le carte sotto
+			for (int i = 0; i < 5; i++) {
+				// Aggiungi l'immagine delle carte sotto
+				ImageView cardImage = new ImageView(new Image(getClass().getResource(Constants.Path.EXMPLE_CARD).toExternalForm()));
+				// Imposta le dimensioni delle immagini delle carte
+				cardImage.setFitWidth(100); // Larghezza maggiore
+				cardImage.setFitHeight(160); // Altezza maggiore
+				bottomCards.getChildren().add(cardImage);
+			}
+			playerArea.getChildren().addAll(nameLabel, topCards, space, bottomCards);
+		}else {
+			playerArea.getChildren().addAll(nameLabel);
+		}
+			
+
+		return playerArea;
+	}
 
 
-	
 	// Metodo per creare bottoni con stile personalizzato
 	private Button createStyledButton(String text, int size) {
 		Button button = new Button(text);
@@ -118,7 +233,6 @@ public class Game {
 
 
 	public Region setBackground(Stage stage) {
-
 		Image sfondo = new Image(getClass().getResource(Constants.Path.GAME_BACKGROUND).toExternalForm());
 		Region contenuto = new Region();
 
