@@ -2,6 +2,7 @@ package jtrash.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 
 public class User implements Serializable{
@@ -13,6 +14,7 @@ public class User implements Serializable{
 	private String nickname;
 	private LocalDate dataNascita;
 	private Integer livello=1;
+	private List<Card> listaCarte;
 	
 	
 	public User() {}
@@ -57,7 +59,14 @@ public class User implements Serializable{
 		this.livello = livello;
 	}
 	
-	
+	public List<Card> getListaCarte() {
+		return listaCarte;
+	}
+
+	public void setListaCarte(List<Card> listaCarte) {
+		this.listaCarte = listaCarte;
+	}
+
 	@Override
 	public String toString() {
 		return "User [nome=" + nome + ", cognome=" + cognome + ", nickname=" + nickname + ", dataNascita=" + dataNascita
