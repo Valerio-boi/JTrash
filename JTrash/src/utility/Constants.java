@@ -62,5 +62,19 @@ public class Constants {
 		
 	}
 	
+	public class Card {
+		public static final String CLUBS = "_of_clubs";
+		public static final String DIAMONDS = "_of_diamonds";
+		public static final String SPADES = "_of_hearts";
+		public static final String HEARTS = "_of_spades";
+		
+		public static final String ACE = "ace";
+		public static final String JACK = "jack";
+		public static final String KING = "king";
+		public static final String QUEEN = "queen";
+		public static final String RED = "red_joker";
+		public static final String BLACK = "black_joker";
+	}
+	
 
 }

@@ -2,6 +2,7 @@ package jtrash.view;
 
 import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -210,7 +211,26 @@ public class Game {
 			}
 			playerArea.getChildren().addAll(nameLabel, topCards, space, bottomCards);
 		}else {
-			playerArea.getChildren().addAll(nameLabel);
+			    ImageView deckImage = new ImageView(new Image(getClass().getResource(Constants.Path.EXMPLE_CARD).toExternalForm()));
+		        deckImage.setFitWidth(100); // Larghezza dell'immagine del mazzo coperto
+		        deckImage.setFitHeight(160); // Altezza dell'immagine del mazzo coperto
+
+		        // Crea una VBox per contenere il titolo e l'immagine del mazzo coperto
+		        VBox controlPanel = new VBox(5);
+		        controlPanel.setAlignment(Pos.CENTER_LEFT); // Allineamento a sinistra
+
+		        // Aggiungi il titolo "Pannello di Controllo"
+		        Label controlLabel = new Label(playerName);
+		        controlLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+		        controlLabel.setAlignment(Pos.CENTER);
+		        controlLabel.setMaxWidth(Double.MAX_VALUE);
+		        VBox.setVgrow(controlLabel, Priority.ALWAYS);
+		        controlLabel.setTextFill(textGradient);
+
+		        VBox.setMargin(deckImage, new Insets(0, 0, 0, 20));
+		        controlPanel.getChildren().addAll(nameLabel, deckImage); // Aggiungi prima nameLabel e poi deckImage
+
+		        playerArea.getChildren().addAll(controlPanel);
 		}
 			
 
