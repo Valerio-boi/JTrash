@@ -18,6 +18,7 @@ public class Constants {
 		public static final String OCCHIALETTO = "/images/occhialetto.jpg";
 		public static final String CAPELLONE = "/images/capellone.jpg";
 		public static final String BACKGROUND = "/images/background.jpg";
+		public static final String GAME_BACKGROUND = "/images/gameBack.jpg";
 		public static final String PERSISTENCE_USER = "/persistence/user.txt";
 		
 	}

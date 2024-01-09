@@ -7,10 +7,8 @@ import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
@@ -45,6 +43,8 @@ public class UserPage {
 	private ObservableList<User> userList;
 	private TableView<User> tableView;
 	private GridPane layoutPane;
+	private Game game;
+	private Stage stage;
 
 	public void userPageShow(Stage stage) {
 		VBox nuovoContenuto = new VBox();
@@ -54,6 +54,7 @@ public class UserPage {
 		Home home = new Home();
 		home.setBackground(stage);
 		stage.setScene(new Scene(new StackPane(home.setBackground(stage),createContent())));
+		this.stage = stage;
 	}
 
 
@@ -266,7 +267,8 @@ public class UserPage {
 
 	        Button playButton = new Button("Gioca");
 	        playButton.setStyle("-fx-font-size: 16px; -fx-text-fill: #FFFFFF; -fx-background-color: #4CAF50; -fx-background-radius: 15;");
-	        playButton.setOnAction(event -> userController.handlePlay(user));
+	        game = new Game();
+	        playButton.setOnAction(event -> game.gamePageShow(stage, user));
 
 	        HBox buttonBox = new HBox(playButton);
 	        buttonBox.setAlignment(Pos.CENTER_LEFT);
@@ -285,6 +287,12 @@ public class UserPage {
 	    GridPane sezioneGiocatorePane = createPlayersSection("Selezione giocatore");
 	    layoutPane.getChildren().removeIf(node -> GridPane.getRowIndex(node) == 0 && GridPane.getColumnIndex(node) == 1); // Rimuove la vecchia sezione dei giocatori
 	    layoutPane.add(sezioneGiocatorePane, 1, 0); // Aggiunge la nuova sezione dei giocatori
+	}
+	
+	private void updateClassificSection() {
+	    GridPane sezioneClassificPane = createClassifica("Classifica");
+	    layoutPane.getChildren().removeIf(node -> GridPane.getRowIndex(node) == 0 && GridPane.getColumnIndex(node) == 2); // Rimuove la vecchia sezione dei giocatori
+	    layoutPane.add(sezioneClassificPane, 2, 0); // Aggiunge la nuova sezione dei giocatori
 	}
 	
 	private TableView createTable() {
@@ -330,6 +338,8 @@ public class UserPage {
 		                    userController.handleElimina(user); // Rimuove l'utente dal file
 		                    tableView.getItems().remove(user); // Rimuove l'utente dalla tabella
 		                    userList.remove(user);
+                            updatePlayersSection();
+                            updateClassificSection();
 		                });
 		                setGraphic(eliminaButton);
 		                setText(null);
@@ -359,6 +369,7 @@ public class UserPage {
 	  		                    tableView.getItems().remove(user); // Rimuove l'utente dalla tabella
 	  		                    userList.add(result.get());
 	                            updatePlayersSection();
+	                            updateClassificSection();
 	                        });
 	                    });
 	                    setGraphic(modificaButton);

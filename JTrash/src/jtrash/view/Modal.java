@@ -12,6 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import utility.Constants;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 
@@ -44,11 +45,11 @@ public class Modal {
 		
 		ButtonType okButtonType = ButtonType.OK;
 		Button okButton = (Button) alert.getDialogPane().lookupButton(okButtonType);
-		okButton.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+		okButton.getStylesheets().add(getClass().getResource(Constants.Path.CSS).toExternalForm());
 
 		ButtonType cancelButtonType = ButtonType.CANCEL;
 		Button cancelButton = (Button) alert.getDialogPane().lookupButton(cancelButtonType);
-		cancelButton.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+		cancelButton.getStylesheets().add(getClass().getResource(Constants.Path.CSS).toExternalForm());
 
 		DialogPane dialogPane = alert.getDialogPane();
 		dialogPane.setStyle("-fx-background-color: #333333; -fx-font-size: 18px;");

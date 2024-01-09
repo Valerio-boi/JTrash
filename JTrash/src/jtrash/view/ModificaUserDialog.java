@@ -7,7 +7,6 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
 import jtrash.model.User;
 import jtrash.controller.UserController;
 import utility.Constants;
