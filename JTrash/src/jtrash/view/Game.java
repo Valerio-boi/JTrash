@@ -250,15 +250,20 @@ public class Game {
 
 					Card carta = gameController.pescaCarta(); // Pesca una carta dal mazzo
 					int cardIndexToReplace = gameController.posizioneCarta(carta); // Questo è un esempio, potresti ottenere il numero da qualche altra parte
-					if (cardIndexToReplace >= 1 && cardIndexToReplace <= 10) {
-
+					if (cardIndexToReplace >= 1 && cardIndexToReplace <= 10 || cardIndexToReplace == 14) {
+						if (gameController.posizioneCarta(carta)==14) {
+							// Mostra la Select List per scegliere un numero da 1 a 10
+							showSelectList(playerArea);
+						}
 
 						// Ottieni l'immagine corrispondente alla carta pescata dal mazzo
 						ImageView cartaPescataImageView = new ImageView(new Image(getClass().getResource(Constants.Path.CARD + carta.getNameCard()).toExternalForm()));
 						cartaPescataImageView.setFitWidth(100);
 						cartaPescataImageView.setFitHeight(160);
 
-
+						//TODO: NON VISUALIZZA IL JOKER PERCHE CARTA SOSTITUITA E NULL 
+						
+						
 						// Ottenere il pannello del giocatore corrispondente all'indice trovato
 						VBox area = (VBox) gameTable.getChildren().get(playerIndex);
 
@@ -272,18 +277,17 @@ public class Game {
 						// Aggiungi l'immagine della carta sostituita nel pannello di controllo accanto al mazzo
 						if(cardSostituita != null) {
 							cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  cardSostituita.getNameCard()).toExternalForm())));
+						}else if(gameController.posizioneCarta(carta)==14) {
+							cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
 						}
 						carteMazzoDisabilitate = true;
 						needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
 					}else {
-						if (gameController.posizioneCarta(carta)==14) {
-							// Mostra la Select List per scegliere un numero da 1 a 10
-							showSelectList(playerArea);
-						}else {
+					
 							needToChangeTurn = true;
 							cartaSostituitaImageView.setImage(null);
 							showChangeTurnMessage(playerArea);
-						}
+					
 
 					}
 
@@ -295,7 +299,8 @@ public class Game {
 				Card carta = cardSostituita; // Pesca una carta dal mazzo
 				int cardIndexToReplace = gameController.posizioneCarta(carta); // Questo è un esempio, potresti ottenere il numero da qualche altra parte
 				System.out.println("MIGNOTTONE ----> " + carta.isBacked());
-				if ((cardIndexToReplace >= 1 && cardIndexToReplace <= 10) && (!gameController.checkExistCard(carta) || carta.isBacked())) {
+				if ((cardIndexToReplace >= 1 && cardIndexToReplace <= 10) && 
+						(!gameController.checkExistCard(carta) || carta.isBacked())) {
 					needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
 
 					// Ottieni l'immagine corrispondente alla carta pescata dal mazzo
@@ -315,6 +320,7 @@ public class Game {
 					playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().equals("Cambio turno"));
 				}else {
 					if (gameController.posizioneCarta(carta)==14) {
+						System.out.println("Sto a usa sto metodo");
 						// Mostra la Select List per scegliere un numero da 1 a 10
 						showSelectList(playerArea);
 					}else {
