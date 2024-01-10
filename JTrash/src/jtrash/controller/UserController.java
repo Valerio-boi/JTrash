@@ -54,7 +54,7 @@ public class UserController {
 
 	public List<User> leggiUtenteDaFile() {
 		List<User> user = new ArrayList<User>();
-		try (FileInputStream fileIn = new FileInputStream("D:\\Progetti\\Privati\\GitHub\\JTrash\\JTrash\\resources\\persistence/user.txt");
+		try (FileInputStream fileIn = new FileInputStream("/Users/valerio/eclipse/Workspace/Trash/JTrash/resources/persistence/user.txt");
 				ObjectInputStream in = new ObjectInputStream(fileIn)) {
 			user = (List<User>) in.readObject();
 		} catch (IOException | ClassNotFoundException e) {

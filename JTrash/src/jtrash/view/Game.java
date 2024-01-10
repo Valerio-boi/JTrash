@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -181,19 +182,20 @@ public class Game {
 
 		playerArea.setSpacing(5);
 
+		HBox topCards = new HBox(20); // 20 di spazio tra le carte
+		topCards.setAlignment(Pos.CENTER);
 		if(controllPannel) {
 			// Sezione per le carte sopra
-			HBox topCards = new HBox(20); // 20 di spazio tra le carte
-			topCards.setAlignment(Pos.CENTER);
 
 			// Aggiungi le carte sopra
 			for (int i = 0; i < 5; i++) {
 				// Aggiungi l'immagine delle carte sopra
-				ImageView cardImage = new ImageView(new Image(getClass().getResource(Constants.Path.BACKED_CARD).toExternalForm()));
+				ImageView cardImageTop = new ImageView(new Image(getClass().getResource(Constants.Path.BACKED_CARD).toExternalForm()));
 				// Imposta le dimensioni delle immagini delle carte
-				cardImage.setFitWidth(100); // Larghezza maggiore
-				cardImage.setFitHeight(160); // Altezza maggiore
-				topCards.getChildren().add(cardImage);
+				cardImageTop.setFitWidth(100); // Larghezza maggiore
+				cardImageTop.setFitHeight(160); // Altezza maggiore
+
+				topCards.getChildren().add(cardImageTop);
 			}
 
 			// Aggiungi spazio tra le carte sopra e sotto
@@ -207,14 +209,16 @@ public class Game {
 			// Aggiungi le carte sotto
 			for (int i = 5; i < 10; i++) {
 				// Aggiungi l'immagine delle carte sotto
-				ImageView cardImage = new ImageView(new Image(getClass().getResource(Constants.Path.BACKED_CARD).toExternalForm()));
+				ImageView cardImageBottom = new ImageView(new Image(getClass().getResource(Constants.Path.BACKED_CARD).toExternalForm()));
 				// Imposta le dimensioni delle immagini delle carte
-				cardImage.setFitWidth(100); // Larghezza maggiore
-				cardImage.setFitHeight(160); // Altezza maggiore
-				bottomCards.getChildren().add(cardImage);
+				cardImageBottom.setFitWidth(100); // Larghezza maggiore
+				cardImageBottom.setFitHeight(160); // Altezza maggiore
+
+				bottomCards.getChildren().add(cardImageBottom);
 			}
 			playerArea.getChildren().addAll(nameLabel, topCards, space, bottomCards);
 		}else {
+
 			ImageView deckImage = new ImageView(new Image(getClass().getResource(Constants.Path.BACKED_CARD).toExternalForm()));
 			deckImage.setFitWidth(100); 
 			deckImage.setFitHeight(160); 
@@ -263,7 +267,7 @@ public class Game {
 						} else { // Altrimenti, sostituisci la carta sotto
 							replaceCardBelow(cardIndexToReplace - 6, cartaPescataImageView.getImage(), area);
 						}
-						
+
 						cardSostituita = gameController.sostituisciCarta(carta, cardIndexToReplace);
 						// Aggiungi l'immagine della carta sostituita nel pannello di controllo accanto al mazzo
 						if(cardSostituita != null) {
@@ -272,9 +276,15 @@ public class Game {
 						carteMazzoDisabilitate = true;
 						needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
 					}else {
-						needToChangeTurn = true;
-						cartaSostituitaImageView.setImage(null);
-						showChangeTurnMessage(playerArea);
+						if (gameController.posizioneCarta(carta)==14) {
+							// Mostra la Select List per scegliere un numero da 1 a 10
+							showSelectList(playerArea);
+						}else {
+							needToChangeTurn = true;
+							cartaSostituitaImageView.setImage(null);
+							showChangeTurnMessage(playerArea);
+						}
+
 					}
 
 				}});
@@ -304,10 +314,15 @@ public class Game {
 					}
 					playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().equals("Cambio turno"));
 				}else {
-					needToChangeTurn = true;
-					// Pulisci l'immagine della carta sostituita nel pannello di controllo
-					cartaSostituitaImageView.setImage(null);
-					showChangeTurnMessage(playerArea);
+					if (gameController.posizioneCarta(carta)==14) {
+						// Mostra la Select List per scegliere un numero da 1 a 10
+						showSelectList(playerArea);
+					}else {
+						needToChangeTurn = true;
+						// Pulisci l'immagine della carta sostituita nel pannello di controllo
+						cartaSostituitaImageView.setImage(null);
+						showChangeTurnMessage(playerArea);
+					}
 				}
 
 				cardSostituita = gameController.sostituisciCarta(carta, cardIndexToReplace);
@@ -315,9 +330,9 @@ public class Game {
 				if(cardSostituita != null && !needToChangeTurn) {
 					cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  cardSostituita.getNameCard()).toExternalForm())));
 				}
-//				else {
-//					cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
-//				}
+				//				else {
+				//					cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
+				//				}
 
 			});
 
@@ -434,7 +449,38 @@ public class Game {
 		return contenuto;
 	}
 
+	private void showSelectList(VBox playerArea) {
+	    Label selectNumberLabel = new Label("Seleziona un numero da 1 a 10:");
+	    selectNumberLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+	    selectNumberLabel.setTextFill(Color.WHITE);
 
+	    // Creazione della Select List con opzioni da 1 a 10
+	    ComboBox<Integer> selectList = new ComboBox<>();
+	    for (int i = 1; i <= 10; i++) {
+	        selectList.getItems().add(i);
+	    }
 
+	    // Stile per la Select List
+	    selectList.setStyle("-fx-font-size: 16px;  -fx-text-fill: white;");
 
+	    // Aggiungi spazio dal bordo sinistro
+	    VBox.setMargin(selectList, new Insets(0, 0, 0, 15));
+
+	    // Aggiungi un gestore degli eventi per gestire la selezione dalla Select List
+	    selectList.setOnAction(e -> handleSelectListSelection(selectList.getValue(), playerArea));
+
+	    // Aggiungi etichetta e Select List al layout del giocatore
+	    playerArea.getChildren().addAll(selectNumberLabel, selectList);
+	}
+
+	private void handleSelectListSelection(int selectedNumber, VBox playerArea) {
+	    // Gestisci la selezione dalla Select List
+	    System.out.println("Numero selezionato: " + selectedNumber);
+
+	    // Puoi eseguire ulteriori azioni qui, se necessario
+
+	    // Rimuovi la Select List dal layout del giocatore
+	    playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().startsWith("Seleziona un numero"));
+	    playerArea.getChildren().remove(1);
+	}
 }

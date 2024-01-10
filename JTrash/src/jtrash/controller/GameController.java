@@ -47,8 +47,8 @@ public class GameController {
 			
 		}
 		
-		mazzo.add(new Card("joker", "black_joker.png"));
-		mazzo.add(new Card("joker", "red_joker.png"));
+		mazzo.add(new Card("joker", "14_black_joker.png"));
+		mazzo.add(new Card("joker", "14_red_joker.png"));
 		
 		
      
@@ -103,7 +103,7 @@ public class GameController {
 	   
 	   public int posizioneCarta(Card carta) {
 		   String prime = "" + carta.getNameCard().charAt(0)+carta.getNameCard().charAt(1);
-		   for(int i= 1; i<=13; i++) {
+		   for(int i= 1; i<=14; i++) {
 			   if(!prime.contains("_") && Integer.parseInt(prime) > 9) {
 				   if(prime.equals("" + i)) {
 					   System.out.println(carta.getNameCard() + "   Dajee " + i);
