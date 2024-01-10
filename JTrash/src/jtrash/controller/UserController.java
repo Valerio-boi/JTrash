@@ -1,24 +1,14 @@
 package jtrash.controller;
 
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-
 import jtrash.model.User;
 import jtrash.view.Home;
-import utility.Constants;
 
 public class UserController {
 
@@ -64,7 +54,7 @@ public class UserController {
 
 	public List<User> leggiUtenteDaFile() {
 		List<User> user = new ArrayList<User>();
-		try (FileInputStream fileIn = new FileInputStream("/Users/valerio/eclipse/Workspace/Trash/JTrash/resources/persistence/user.txt");
+		try (FileInputStream fileIn = new FileInputStream("D:\\Progetti\\Privati\\GitHub\\JTrash\\JTrash\\resources\\persistence/user.txt");
 				ObjectInputStream in = new ObjectInputStream(fileIn)) {
 			user = (List<User>) in.readObject();
 		} catch (IOException | ClassNotFoundException e) {

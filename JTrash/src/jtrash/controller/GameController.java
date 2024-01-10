@@ -13,7 +13,7 @@ public class GameController {
 
 	public List<Card> mazzo = new ArrayList<Card>();
 	public List<User> listaGiocatori = new ArrayList<User>();
-	public int currentPlayerIndex = 0;
+	private int currentPlayerIndex = 0;
 	
 	ArrayList<String> tipiCarteNum = new ArrayList<String>(Arrays.asList(
 			Constants.Card.CLUBS,Constants.Card.DIAMONDS, 
@@ -116,5 +116,23 @@ public class GameController {
 		   
 		   return 0;
 	   }
+	   
+	   public boolean checkExistCard(Card card) {
+		   System.out.println("Posizione carta di arrivo --> " + posizioneCarta(card) + " Posizione carta che ci sta ---> " + posizioneCarta(listaGiocatori.get(currentPlayerIndex).getListaCarte().get(posizioneCarta(card) - 1)));
+		   if(posizioneCarta(card) == posizioneCarta(listaGiocatori.get(currentPlayerIndex).getListaCarte().get(posizioneCarta(card) - 1))) {
+			   System.out.println("La carta è gia stata impostata");
+			   return true;
+		   }
+		   
+		   return false;
+	   }
+
+	public int getCurrentPlayerIndex() {
+		return currentPlayerIndex;
+	}
+
+	public void setCurrentPlayerIndex(int currentPlayerIndex) {
+		this.currentPlayerIndex = currentPlayerIndex;
+	}
 	
 }

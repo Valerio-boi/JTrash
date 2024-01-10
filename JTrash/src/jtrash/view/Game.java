@@ -33,6 +33,8 @@ public class Game {
 	private int numberOfPlayers;
 	private Card cardSostituita;
 	private boolean needToChangeTurn;
+	private boolean carteMazzoDisabilitate = false;
+	private ImageView cardDisabled;
 
 	public void gamePageShow(Stage stage, User user) {
 		this.user = user;
@@ -232,52 +234,63 @@ public class Game {
 
 
 			deckImage.setOnMouseClicked(event -> {
-				Card carta = gameController.pescaCarta(); // Pesca una carta dal mazzo
-				int cardIndexToReplace = gameController.posizioneCarta(carta); // Questo è un esempio, potresti ottenere il numero da qualche altra parte
-				if (cardIndexToReplace >= 1 && cardIndexToReplace <= 10) {
+				// Trova l'indice del giocatore nel GridPane (es. il primo giocatore)
+				int playerIndex = gameController.getCurrentPlayerIndex();
+				cardDisabled = (ImageView) deckAndReplacement.getChildren().get(0);
+				cardDisabled.setDisable(true);
+				cardDisabled.setOpacity(0.5); // Imposta l'opacità a metà per indicare che è disabilitata
+
+				if (!carteMazzoDisabilitate) {
+
+					Card carta = gameController.pescaCarta(); // Pesca una carta dal mazzo
+					int cardIndexToReplace = gameController.posizioneCarta(carta); // Questo è un esempio, potresti ottenere il numero da qualche altra parte
+					if (cardIndexToReplace >= 1 && cardIndexToReplace <= 10) {
 
 
-					// Ottieni l'immagine corrispondente alla carta pescata dal mazzo
-					ImageView cartaPescataImageView = new ImageView(new Image(getClass().getResource(Constants.Path.CARD + carta.getNameCard()).toExternalForm()));
-					cartaPescataImageView.setFitWidth(100);
-					cartaPescataImageView.setFitHeight(160);
+						// Ottieni l'immagine corrispondente alla carta pescata dal mazzo
+						ImageView cartaPescataImageView = new ImageView(new Image(getClass().getResource(Constants.Path.CARD + carta.getNameCard()).toExternalForm()));
+						cartaPescataImageView.setFitWidth(100);
+						cartaPescataImageView.setFitHeight(160);
 
-					// Trova l'indice del giocatore nel GridPane (es. il primo giocatore)
-					int playerIndex = 2;
 
-					// Ottenere il pannello del giocatore corrispondente all'indice trovato
-					VBox area = (VBox) gameTable.getChildren().get(playerIndex);
+						// Ottenere il pannello del giocatore corrispondente all'indice trovato
+						VBox area = (VBox) gameTable.getChildren().get(playerIndex);
 
-					if (cardIndexToReplace <= 5) { // Se il numero è tra 1 e 5, sostituisci la carta sopra
-						replaceCardAbove(cardIndexToReplace - 1, cartaPescataImageView.getImage(), area);
-					} else { // Altrimenti, sostituisci la carta sotto
-						replaceCardBelow(cardIndexToReplace - 6, cartaPescataImageView.getImage(), area);
+						if (cardIndexToReplace <= 5) { // Se il numero è tra 1 e 5, sostituisci la carta sopra
+							replaceCardAbove(cardIndexToReplace - 1, cartaPescataImageView.getImage(), area);
+						} else { // Altrimenti, sostituisci la carta sotto
+							replaceCardBelow(cardIndexToReplace - 6, cartaPescataImageView.getImage(), area);
+						}
+						cardSostituita = gameController.sostituisciCarta(carta, cardIndexToReplace);
+						// Aggiungi l'immagine della carta sostituita nel pannello di controllo accanto al mazzo
+						if(cardSostituita != null) {
+							cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  cardSostituita.getNameCard()).toExternalForm())));
+						}
+					}else {
+						needToChangeTurn = true;
+//						cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
+						// Pulisci l'immagine della carta sostituita nel pannello di controllo
+						 cartaSostituitaImageView.setImage(null);
+						showChangeTurnMessage(playerArea);
 					}
-				}else {
-					needToChangeTurn = true;
-					// Pulisci l'immagine della carta sostituita nel pannello di controllo
-					cartaSostituitaImageView.setImage(null);
-					showChangeTurnMessage(playerArea);
-				}
-				cardSostituita = gameController.sostituisciCarta(carta, cardIndexToReplace);
-				// Aggiungi l'immagine della carta sostituita nel pannello di controllo accanto al mazzo
-				cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  cardSostituita.getNameCard()).toExternalForm())));
-				needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
-				playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().equals("Cambio turno"));
-			});
+					carteMazzoDisabilitate = true;
+					needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
+					playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().equals("Cambio turno"));
+				}});
 
 			cartaSostituitaImageView.setOnMouseClicked(event -> {
+				// Trova l'indice del giocatore nel GridPane (es. il primo giocatore)
+				int playerIndex = gameController.getCurrentPlayerIndex();
 				Card carta = cardSostituita; // Pesca una carta dal mazzo
 				int cardIndexToReplace = gameController.posizioneCarta(carta); // Questo è un esempio, potresti ottenere il numero da qualche altra parte
-				if (cardIndexToReplace >= 1 && cardIndexToReplace <= 10) {
+				if (cardIndexToReplace >= 1 && cardIndexToReplace <= 10 && !gameController.checkExistCard(carta)) {
+					needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
 
 					// Ottieni l'immagine corrispondente alla carta pescata dal mazzo
 					ImageView cartaPescataImageView = new ImageView(new Image(getClass().getResource(Constants.Path.CARD + carta.getNameCard()).toExternalForm()));
 					cartaPescataImageView.setFitWidth(100);
 					cartaPescataImageView.setFitHeight(160);
 
-					// Trova l'indice del giocatore nel GridPane (es. il primo giocatore)
-					int playerIndex = 2;
 
 					// Ottenere il pannello del giocatore corrispondente all'indice trovato
 					VBox area = (VBox) gameTable.getChildren().get(playerIndex);
@@ -287,7 +300,6 @@ public class Game {
 					} else { // Altrimenti, sostituisci la carta sotto
 						replaceCardBelow(cardIndexToReplace - 6, cartaPescataImageView.getImage(), area);
 					}
-					needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
 					playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().equals("Cambio turno"));
 				}else {
 					needToChangeTurn = true;
@@ -298,7 +310,12 @@ public class Game {
 
 				cardSostituita = gameController.sostituisciCarta(carta, cardIndexToReplace);
 				// Aggiungi l'immagine della carta sostituita nel pannello di controllo accanto al mazzo
-				cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  cardSostituita.getNameCard()).toExternalForm())));
+				if(cardSostituita != null) {
+					cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  cardSostituita.getNameCard()).toExternalForm())));
+				}else {
+					cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
+				}
+
 			});
 
 			VBox controlPanel = new VBox(5);
@@ -328,9 +345,19 @@ public class Game {
 
 			// Rimuovi eventuali messaggi precedenti prima di aggiungere il nuovo messaggio
 			playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().equals("Cambio turno"));
+			if(numberOfPlayers == gameController.getCurrentPlayerIndex()) {
+				gameController.setCurrentPlayerIndex(0);
+			}else {
+				gameController.setCurrentPlayerIndex(gameController.getCurrentPlayerIndex() + 1);
+			}
 
 			// Aggiungi il messaggio al pannello di controllo
 			playerArea.getChildren().add(changeTurnLabel);
+			carteMazzoDisabilitate = false;
+			if (cardDisabled != null) {
+				cardDisabled.setDisable(false); // Rimuovi il disabilitamento
+				cardDisabled.setOpacity(1.0); // Ripristina l'opacità
+			}
 		}
 	}
 
@@ -341,14 +368,19 @@ public class Game {
 
 			if (cardIndex >= 0 && cardIndex < 5) {
 				Node cardNodeToReplace = cardsAbove.getChildren().get(cardIndex);
+				cardNodeToReplace.setDisable(true);
 				if (cardNodeToReplace instanceof ImageView) {
 					ImageView cardToReplace = (ImageView) cardNodeToReplace;
 					cardToReplace.setImage(newCardImage);
 
+
 					// Esegui altre operazioni qui, se necessario
 				}
 			}
+
 		}
+
+
 	}
 
 	// Metodo per sostituire la carta sotto del giocatore
@@ -358,6 +390,7 @@ public class Game {
 
 			if (cardIndex >= 0 && cardIndex < 5) {
 				Node cardNodeToReplace = cardsBelow.getChildren().get(cardIndex);
+				cardNodeToReplace.setDisable(true);
 				if (cardNodeToReplace instanceof ImageView) {
 					ImageView cardToReplace = (ImageView) cardNodeToReplace;
 					cardToReplace.setImage(newCardImage);
@@ -365,6 +398,7 @@ public class Game {
 					// Esegui altre operazioni qui, se necessario
 				}
 			}
+
 		}
 	}
 
