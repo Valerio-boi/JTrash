@@ -41,6 +41,7 @@ public class GameController {
 					break;
 				}
 				carta.setNameCard("" + i + iter + ".png");
+				carta.setBacked(true);
 				mazzo.add(carta);
 			}
 			
@@ -93,6 +94,8 @@ public class GameController {
 		   Card card = null;
 		   if(posizione <= 10) {
 			  card = listaGiocatori.get(currentPlayerIndex).getListaCarte().get(posizione - 1);
+			  carta.setBacked(false);
+			  card.setBacked(false);
 			  listaGiocatori.get(currentPlayerIndex).getListaCarte().set(posizione -1, carta);
 		   }
 		   return card;

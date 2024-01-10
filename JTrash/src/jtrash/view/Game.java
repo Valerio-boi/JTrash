@@ -127,10 +127,10 @@ public class Game {
 			for (int j = 0; j < cols; j++) {
 				String playerName = "";
 				boolean isControlPanel = true;
-
+				System.out.println("Rows e Col ---> " + rows + " " + cols + " i ---> " + i + " j ---> " + j);
 				if (i == 0 && j == 0) {
 					playerName = user.getNickname();
-				} else if ((i + 1) == rows && (j + 1) == cols) {
+				} else if ((i * cols + j) == numberOfPlayers - 1) {
 					playerName = "Pannel control";
 					isControlPanel = false;
 				} else {
@@ -234,6 +234,8 @@ public class Game {
 
 
 			deckImage.setOnMouseClicked(event -> {
+				// Rimuovi eventuali messaggi precedenti prima di aggiungere il nuovo messaggio
+				playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().equals("Cambio turno"));
 				// Trova l'indice del giocatore nel GridPane (es. il primo giocatore)
 				int playerIndex = gameController.getCurrentPlayerIndex();
 				cardDisabled = (ImageView) deckAndReplacement.getChildren().get(0);
@@ -261,21 +263,20 @@ public class Game {
 						} else { // Altrimenti, sostituisci la carta sotto
 							replaceCardBelow(cardIndexToReplace - 6, cartaPescataImageView.getImage(), area);
 						}
+						
 						cardSostituita = gameController.sostituisciCarta(carta, cardIndexToReplace);
 						// Aggiungi l'immagine della carta sostituita nel pannello di controllo accanto al mazzo
 						if(cardSostituita != null) {
 							cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  cardSostituita.getNameCard()).toExternalForm())));
 						}
+						carteMazzoDisabilitate = true;
+						needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
 					}else {
 						needToChangeTurn = true;
-//						cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
-						// Pulisci l'immagine della carta sostituita nel pannello di controllo
-						 cartaSostituitaImageView.setImage(null);
+						cartaSostituitaImageView.setImage(null);
 						showChangeTurnMessage(playerArea);
 					}
-					carteMazzoDisabilitate = true;
-					needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
-					playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().equals("Cambio turno"));
+
 				}});
 
 			cartaSostituitaImageView.setOnMouseClicked(event -> {
@@ -283,7 +284,8 @@ public class Game {
 				int playerIndex = gameController.getCurrentPlayerIndex();
 				Card carta = cardSostituita; // Pesca una carta dal mazzo
 				int cardIndexToReplace = gameController.posizioneCarta(carta); // Questo è un esempio, potresti ottenere il numero da qualche altra parte
-				if (cardIndexToReplace >= 1 && cardIndexToReplace <= 10 && !gameController.checkExistCard(carta)) {
+				System.out.println("MIGNOTTONE ----> " + carta.isBacked());
+				if ((cardIndexToReplace >= 1 && cardIndexToReplace <= 10) && (!gameController.checkExistCard(carta) || carta.isBacked())) {
 					needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
 
 					// Ottieni l'immagine corrispondente alla carta pescata dal mazzo
@@ -310,11 +312,12 @@ public class Game {
 
 				cardSostituita = gameController.sostituisciCarta(carta, cardIndexToReplace);
 				// Aggiungi l'immagine della carta sostituita nel pannello di controllo accanto al mazzo
-				if(cardSostituita != null) {
+				if(cardSostituita != null && !needToChangeTurn) {
 					cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  cardSostituita.getNameCard()).toExternalForm())));
-				}else {
-					cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
 				}
+//				else {
+//					cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
+//				}
 
 			});
 
@@ -343,14 +346,12 @@ public class Game {
 			changeTurnLabel.setFont(Font.font("Arial", FontWeight.BOLD, 40));
 			changeTurnLabel.setTextFill(Color.WHITE);
 
-			// Rimuovi eventuali messaggi precedenti prima di aggiungere il nuovo messaggio
-			playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().equals("Cambio turno"));
-			if(numberOfPlayers == gameController.getCurrentPlayerIndex()) {
+			if((numberOfPlayers - 2) == gameController.getCurrentPlayerIndex()) {
 				gameController.setCurrentPlayerIndex(0);
 			}else {
 				gameController.setCurrentPlayerIndex(gameController.getCurrentPlayerIndex() + 1);
 			}
-
+			System.out.println("Utente in gioco ---> " + gameController.getCurrentPlayerIndex());
 			// Aggiungi il messaggio al pannello di controllo
 			playerArea.getChildren().add(changeTurnLabel);
 			carteMazzoDisabilitate = false;

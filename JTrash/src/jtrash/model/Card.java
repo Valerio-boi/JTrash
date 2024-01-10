@@ -5,6 +5,7 @@ public class Card {
 	
 	private String seme;
 	private String nameCard;
+	private boolean backed;
 	
 	public Card() {}
 	
@@ -17,6 +18,7 @@ public class Card {
 	public String getSeme() {
 		return seme;
 	}
+	
 	public void setSeme(String seme) {
 		this.seme = seme;
 	}
@@ -24,9 +26,19 @@ public class Card {
 	public String getNameCard() {
 		return nameCard;
 	}
+	
 	public void setNameCard(String nameCard) {
 		this.nameCard = nameCard;
 	}
+
+	public boolean isBacked() {
+		return backed;
+	}
+
+	public void setBacked(boolean backed) {
+		this.backed = backed;
+	}
+	
 
 
 	
