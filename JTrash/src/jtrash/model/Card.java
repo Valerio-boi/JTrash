@@ -9,10 +9,11 @@ public class Card {
 	
 	public Card() {}
 	
-	public Card(String seme, String nameCard) {
+	public Card(String seme, String nameCard, boolean backed) {
 		super();
 		this.seme = seme;
 		this.nameCard = nameCard;
+		this.backed = backed;
 	}
 	
 	public String getSeme() {
@@ -37,6 +38,11 @@ public class Card {
 
 	public void setBacked(boolean backed) {
 		this.backed = backed;
+	}
+
+	@Override
+	public String toString() {
+		return "Card [seme=" + seme + ", nameCard=" + nameCard + ", backed=" + backed + "]";
 	}
 	
 

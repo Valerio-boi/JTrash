@@ -5,6 +5,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import jtrash.model.Card;
 import jtrash.model.User;
 import utility.Constants;
@@ -47,8 +52,8 @@ public class GameController {
 			
 		}
 		
-		mazzo.add(new Card("joker", "14_black_joker.png"));
-		mazzo.add(new Card("joker", "14_red_joker.png"));
+		mazzo.add(new Card("joker", "14_black_joker.png", true));
+		mazzo.add(new Card("joker", "14_red_joker.png", true));
 		
 		
      
@@ -94,19 +99,49 @@ public class GameController {
 		   Card card = null;
 		   if(posizione <= 10) {
 			  card = listaGiocatori.get(currentPlayerIndex).getListaCarte().get(posizione - 1);
-			  carta.setBacked(false);
-			  card.setBacked(false);
 			  listaGiocatori.get(currentPlayerIndex).getListaCarte().set(posizione -1, carta);
 		   }
 		   return card;
 	   }
+	   
+		public boolean checkCartaCoperta(int cardIndex, VBox playerArea, boolean upDown) {
+			ImageView cardToReplace = new ImageView();
+			
+			if (upDown) {
+				HBox cardsAbove = (HBox) playerArea.getChildren().get(1); // Sezione delle carte sopra
+
+				if (cardIndex >= 0 && cardIndex < 5) {
+					Node cardNodeToReplace = cardsAbove.getChildren().get(cardIndex);
+					cardNodeToReplace.setDisable(true);
+					if (cardNodeToReplace instanceof ImageView) {
+						 cardToReplace = (ImageView) cardNodeToReplace;
+						System.out.println(cardToReplace);
+					}
+				}
+
+			}else {
+				HBox cardsBelow = (HBox) playerArea.getChildren().get(3);
+				
+				if (cardIndex >= 0 && cardIndex < 5) {
+					
+					Node cardNodeToReplace = cardsBelow.getChildren().get(cardIndex);
+					cardNodeToReplace.setDisable(true);
+					if (cardNodeToReplace instanceof ImageView) {
+						 cardToReplace = (ImageView) cardNodeToReplace;
+						 System.out.println(cardToReplace);
+					}
+				}
+			}
+			
+			return cardToReplace.getImage().getUrl().contains("backBlack.png");
+
+		}
 	   
 	   public int posizioneCarta(Card carta) {
 		   String prime = "" + carta.getNameCard().charAt(0)+carta.getNameCard().charAt(1);
 		   for(int i= 1; i<=14; i++) {
 			   if(!prime.contains("_") && Integer.parseInt(prime) > 9) {
 				   if(prime.equals("" + i)) {
-					   System.out.println(carta.getNameCard() + "   Dajee " + i);
 					   return i;
 				   }
 			   }else {
@@ -120,9 +155,14 @@ public class GameController {
 		   return 0;
 	   }
 	   
-	   public boolean checkExistCard(Card card) {
-		   System.out.println("Posizione carta di arrivo --> " + posizioneCarta(card) + " Posizione carta che ci sta ---> " + posizioneCarta(listaGiocatori.get(currentPlayerIndex).getListaCarte().get(posizioneCarta(card) - 1)));
-		   if(posizioneCarta(card) == posizioneCarta(listaGiocatori.get(currentPlayerIndex).getListaCarte().get(posizioneCarta(card) - 1))) {
+	   public boolean checkExistCard(Card card, boolean isScoperta) {
+		   if(posizioneCarta(card)==14) {
+			   return false;
+		   }
+//		   System.out.println("Carta che vorrei sostituire ---> " + card.toString());
+//		   System.out.println("Carta che nel pannello ---> " + listaGiocatori.get(currentPlayerIndex).getListaCarte().get(posizioneCarta(card) - 1).toString());
+//		   System.out.println("Posizione carta di arrivo --> " + posizioneCarta(card) + " Posizione carta che ci sta ---> " + posizioneCarta(listaGiocatori.get(currentPlayerIndex).getListaCarte().get(posizioneCarta(card) - 1)) + " ed è girata: " + listaGiocatori.get(currentPlayerIndex).getListaCarte().get(posizioneCarta(card) - 1).isBacked());
+		   if(isScoperta && (posizioneCarta(card) == posizioneCarta(listaGiocatori.get(currentPlayerIndex).getListaCarte().get(posizioneCarta(card) - 1)))) {
 			   System.out.println("La carta è gia stata impostata");
 			   return true;
 		   }
