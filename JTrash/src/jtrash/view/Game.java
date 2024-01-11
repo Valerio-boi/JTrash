@@ -265,9 +265,10 @@ public class Game {
 						isCoperta = gameController.checkCartaCoperta(cardIndexToReplace - 6, area, false);
 					}
 					System.out.println("Dimme che sta coperta -> " + isCoperta);
-					
-					if (((cardIndexToReplace >= 1 && cardIndexToReplace <= 10) || cardIndexToReplace == 14) && !gameController.checkExistCard(carta, !isCoperta)) {
+				
+					if (((cardIndexToReplace >= 1 && cardIndexToReplace <= 10)) && !gameController.checkExistCard(carta, !isCoperta)) {
 
+						
 						// Ottieni l'immagine corrispondente alla carta pescata dal mazzo
 						ImageView cartaPescataImageView = new ImageView(new Image(getClass().getResource(Constants.Path.CARD + carta.getNameCard()).toExternalForm()));
 						cartaPescataImageView.setFitWidth(100);
@@ -299,16 +300,23 @@ public class Game {
 						carteMazzoDisabilitate = true;
 						needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
 					}else {
-						//aggiungi carta nel mazzo scartato
-						needToChangeTurn = true;
-						cartaSostituitaImageView.setImage(null);
-						cartaScartata.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
-						showChangeTurnMessage(playerArea);
-
-
+						if (gameController.posizioneCarta(carta)==14) {
+							// Mostra la Select List per scegliere un numero da 1 a 10
+							cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
+							showSelectList(playerArea, carta, cartaSostituitaImageView);
+						}else {
+							//aggiungi carta nel mazzo scartato
+							needToChangeTurn = true;
+							cartaSostituitaImageView.setImage(null);
+							cartaScartata.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
+							showChangeTurnMessage(playerArea);
+						}
 					}
-
 				}});
+							
+
+
+
 
 			cartaSostituitaImageView.setOnMouseClicked(event -> {
 				// Trova l'indice del giocatore nel GridPane (es. il primo giocatore)
