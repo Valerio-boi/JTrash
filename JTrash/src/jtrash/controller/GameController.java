@@ -192,7 +192,26 @@ public class GameController {
 		System.out.println("So tutte scoperte TRASH");
 		return true;
 	}
+	
+	public int getFirstBacked(VBox playerArea) {
+		boolean isCoperta = false;
+		for(int i = 0; i<10; i++) {
+			if (i <= 4) { // Se il numero è tra 1 e 5, sostituisci la carta sopra
+				isCoperta = checkCartaCoperta(i,  playerArea, true);
+			} else if(i <= 9) { // Altrimenti, sostituisci la carta sotto
+				isCoperta = checkCartaCoperta(i - 5, playerArea, false);
+			}
+			
+			if(isCoperta) {
+				System.out.println("Is copertaaa get fdirts " + i);
+				return i;
+			}
+		}
 
+		return 0;
+	}
+	
+	
 	public int getCurrentPlayerIndex() {
 		return currentPlayerIndex;
 	}

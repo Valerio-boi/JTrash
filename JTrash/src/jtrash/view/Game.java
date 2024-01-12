@@ -26,8 +26,10 @@ import jtrash.controller.GameController;
 import jtrash.model.Card;
 import jtrash.model.User;
 import utility.Constants;
+import utility.SupportClass;
 
 public class Game {
+
 	private User user;
 	private GameController gameController;
 	private GridPane gameTable;
@@ -36,63 +38,39 @@ public class Game {
 	private boolean needToChangeTurn;
 	private boolean carteMazzoDisabilitate = false;
 	private ImageView cardDisabled;
+	private SupportClass support;
 
 	public void gamePageShow(Stage stage, User user) {
 		this.user = user;
 		this.gameController = new GameController();
-
+		this.support = new SupportClass();
 
 		StackPane contentPane = new StackPane();
 		contentPane.setAlignment(Pos.TOP_CENTER);
 
-		// Testo di benvenuto con effetto e animazione
-		Text welcomeText = new Text("Benvenuto, " + user.getNickname() + "!");
-		welcomeText.setFont(Font.font("Arial", FontWeight.BOLD, 50));
-		LinearGradient welcomeGradient = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
-				new Stop(0, Color.DARKORANGE), new Stop(1, Color.GOLD));
-		welcomeText.setFill(welcomeGradient);
+		Text welcomeText = support.createStyledText("Benvenuto, " + user.getNickname() + "!", 50);
+		Text selectPlayersText = support.createStyledText("Seleziona con quante persone vuoi giocare:", 20);
 
-		// Testo per la selezione del numero di giocatori
-		Text selectPlayersText = new Text("Seleziona con quante persone vuoi giocare:");
-		selectPlayersText.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-		LinearGradient selectPlayersGradient = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
-				new Stop(0, Color.DARKORANGE), new Stop(1, Color.GOLD));
-		selectPlayersText.setFill(selectPlayersGradient);
-
-		// Effetto ombra per i testi
 		DropShadow shadow = new DropShadow();
 		shadow.setColor(Color.BLACK);
-		welcomeText.setEffect(shadow);
-		selectPlayersText.setEffect(shadow);
+		support.applyShadow(welcomeText, shadow);
+		support.applyShadow(selectPlayersText, shadow);
 
-		// Animazione di scaling per il testo di benvenuto
-		ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(1), welcomeText);
-		scaleTransition.setToX(1.5);
-		scaleTransition.setToY(1.5);
-		scaleTransition.setAutoReverse(true);
-		scaleTransition.setCycleCount(Timeline.INDEFINITE);
-		scaleTransition.play();
+		ScaleTransition scaleTransition = support.createScaleTransition(welcomeText);
 
-		// Pulsanti per la scelta del numero di giocatori
-		Button player1Button = createStyledButton("Contro 1", 20);
-		Button player3Button = createStyledButton("Contro 2", 20);
-		Button player5Button = createStyledButton("Contro 4", 20);
+		Button player1Button = support.createStyledButton("Contro 1", 20);
+		Button player3Button = support.createStyledButton("Contro 2", 20);
+		Button player5Button = support.createStyledButton("Contro 3", 20);
 
 		player1Button.setOnAction(e -> createGameTable(3, stage));
 		player3Button.setOnAction(e -> createGameTable(4, stage));
-		player5Button.setOnAction(e -> createGameTable(6, stage));
+		player5Button.setOnAction(e -> createGameTable(5, stage));
 
-		// Layout per i pulsanti
-		HBox buttonsBox = new HBox(20);
-		buttonsBox.setAlignment(Pos.CENTER);
-		buttonsBox.getChildren().addAll(player1Button, player3Button, player5Button);
+		HBox buttonsBox = support.createHBox(20, player1Button, player3Button, player5Button);
 
-		// Layout principale
-		VBox mainLayout = new VBox(20);
-		mainLayout.setAlignment(Pos.CENTER);
-		mainLayout.getChildren().addAll(welcomeText, selectPlayersText, buttonsBox);
+		VBox mainLayout = support.createVBox(20, welcomeText, selectPlayersText, buttonsBox);
 
-		contentPane.getChildren().addAll(new StackPane(setBackground(stage)), mainLayout);
+		contentPane.getChildren().addAll(new StackPane(support.setBackground(stage, Constants.Path.GAME_BACKGROUND)), mainLayout);
 
 		Scene currentScene = stage.getScene();
 		currentScene.setRoot(contentPane);
@@ -141,6 +119,7 @@ public class Game {
 				VBox playerArea = createPlayerArea(playerName, isControlPanel,
 						gameController.listaGiocatori.get(i * cols + j < gameController.listaGiocatori.size() ? i * cols + j : 0));
 
+
 				if (i * cols + j < numberOfPlayers) {
 					gameTable.add(playerArea, j, i);
 				} else if (numberOfPlayers % 2 == 1 && j == 0) {
@@ -149,7 +128,7 @@ public class Game {
 			}
 		}
 
-		contentPane.getChildren().addAll(new StackPane(setBackground(stage)), gameTable);
+		contentPane.getChildren().addAll(new StackPane(support.setBackground(stage, Constants.Path.GAME_BACKGROUND)), gameTable);
 
 
 		Scene currentScene = stage.getScene();
@@ -218,7 +197,6 @@ public class Game {
 			}
 			playerArea.getChildren().addAll(nameLabel, topCards, space, bottomCards);
 		}else {
-
 			ImageView deckImage = new ImageView(new Image(getClass().getResource(Constants.Path.BACKED_CARD).toExternalForm()));
 			deckImage.setFitWidth(100); 
 			deckImage.setFitHeight(160); 
@@ -242,142 +220,11 @@ public class Game {
 
 
 			deckImage.setOnMouseClicked(event -> {
-				// Rimuovi eventuali messaggi precedenti prima di aggiungere il nuovo messaggio
-				playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().contains("Turno di: "));
-				// Trova l'indice del giocatore nel GridPane (es. il primo giocatore)
-				int playerIndex = gameController.getCurrentPlayerIndex();
-				cardDisabled = (ImageView) deckAndReplacement.getChildren().get(0);
-				cardDisabled.setDisable(true);
-				cardDisabled.setOpacity(0.5); // Imposta l'opacità a metà per indicare che è disabilitata
-
-				if (!carteMazzoDisabilitate) {
-
-					Card carta = gameController.pescaCarta(); // Pesca una carta dal mazzo
-					int cardIndexToReplace = gameController.posizioneCarta(carta);
-
-					// Ottenere il pannello del giocatore corrispondente all'indice trovato
-					VBox area = (VBox) gameTable.getChildren().get(playerIndex);
-					boolean isCoperta = false;
-					System.out.println("MA COME STA MESSA ---> " + carta.toString());
-
-					if (cardIndexToReplace <= 5) { // Se il numero è tra 1 e 5, sostituisci la carta sopra
-						isCoperta = gameController.checkCartaCoperta(cardIndexToReplace - 1,  area, true);
-					} else if(cardIndexToReplace <= 10){ // Altrimenti, sostituisci la carta sotto
-						isCoperta = gameController.checkCartaCoperta(cardIndexToReplace - 6, area, false);
-					}
-					System.out.println("Dimme che sta coperta -> " + isCoperta);
-
-					if (((cardIndexToReplace >= 1 && cardIndexToReplace <= 10)) && !gameController.checkExistCard(carta, !isCoperta)) {
-
-
-						// Ottieni l'immagine corrispondente alla carta pescata dal mazzo
-						ImageView cartaPescataImageView = new ImageView(new Image(getClass().getResource(Constants.Path.CARD + carta.getNameCard()).toExternalForm()));
-						cartaPescataImageView.setFitWidth(100);
-						cartaPescataImageView.setFitHeight(160);
-
-
-						if (cardIndexToReplace <= 5) { // Se il numero è tra 1 e 5, sostituisci la carta sopra
-							replaceCardAbove(cardIndexToReplace - 1, cartaPescataImageView.getImage(), area);
-						} else { // Altrimenti, sostituisci la carta sotto
-							replaceCardBelow(cardIndexToReplace - 6, cartaPescataImageView.getImage(), area);
-						}
-
-						cardSostituita = gameController.sostituisciCarta(carta, cardIndexToReplace);
-
-						// Aggiungi l'immagine della carta sostituita nel pannello di controllo accanto al mazzo
-						if(cardSostituita != null) {
-							if (gameController.posizioneCarta(cardSostituita)==14 || gameController.posizioneCarta(cardSostituita)==12) {
-								// Mostra la Select List per scegliere un numero da 1 a 10
-								showSelectList(playerArea, cardSostituita, cartaSostituitaImageView);
-							}
-							cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  cardSostituita.getNameCard()).toExternalForm())));
-						}else if(gameController.posizioneCarta(carta)==14 || gameController.posizioneCarta(carta)==12) {
-							cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
-						}
-						carteMazzoDisabilitate = true;
-						needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
-					}else {
-						if (gameController.posizioneCarta(carta)==14 || gameController.posizioneCarta(carta)==12) {
-							// Mostra la Select List per scegliere un numero da 1 a 10
-							cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
-							cartaSostituitaImageView.setDisable(true);
-							cartaSostituitaImageView.setOpacity(0.5);
-
-							showSelectList(playerArea, carta, cartaSostituitaImageView);
-						}else {
-							//aggiungi carta nel mazzo scartato
-							needToChangeTurn = true;
-							cartaSostituitaImageView.setImage(null);
-							cartaScartata.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
-							showChangeTurnMessage(playerArea);
-						}
-					}
-
-					if(gameController.checkIsTrash(area)) {
-						System.out.println("Trash");
-						//						showTrashMessage(playerArea);
-					}
-
-				}});
-
-
-
-
+				logicDeck(playerArea, deckAndReplacement, cartaSostituitaImageView, cartaScartata,false);
+			});
 
 			cartaSostituitaImageView.setOnMouseClicked(event -> {
-				// Trova l'indice del giocatore nel GridPane (es. il primo giocatore)
-				int playerIndex = gameController.getCurrentPlayerIndex();
-				Card carta = cardSostituita;
-				int cardIndexToReplace = gameController.posizioneCarta(carta); // Questo è un esempio, potresti ottenere il numero da qualche altra parte
-				VBox area = (VBox) gameTable.getChildren().get(playerIndex);
-				boolean isCoperta = false;
-				if (cardIndexToReplace <= 5) { // Se il numero è tra 1 e 5, sostituisci la carta sopra
-					isCoperta = gameController.checkCartaCoperta(cardIndexToReplace - 1,  area, true);
-				} else if(cardIndexToReplace <= 10) { // Altrimenti, sostituisci la carta sotto
-					isCoperta = gameController.checkCartaCoperta(cardIndexToReplace - 6, area, false);
-				}
-
-				if ((cardIndexToReplace >= 1 && cardIndexToReplace <= 10) && !gameController.checkExistCard(carta, !isCoperta)) {
-
-					needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
-
-					// Ottieni l'immagine corrispondente alla carta pescata dal mazzo
-					ImageView cartaPescataImageView = new ImageView(new Image(getClass().getResource(Constants.Path.CARD + carta.getNameCard()).toExternalForm()));
-					cartaPescataImageView.setFitWidth(100);
-					cartaPescataImageView.setFitHeight(160);
-
-
-					// Ottenere il pannello del giocatore corrispondente all'indice trovato
-
-					if (cardIndexToReplace <= 5) { // Se il numero è tra 1 e 5, sostituisci la carta sopra
-						replaceCardAbove(cardIndexToReplace - 1, cartaPescataImageView.getImage(), area);
-					} else { // Altrimenti, sostituisci la carta sotto
-						replaceCardBelow(cardIndexToReplace - 6, cartaPescataImageView.getImage(), area);
-					}
-					playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().contains("Turno di: "));
-				}else {
-					needToChangeTurn = true;
-					// Pulisci l'immagine della carta sostituita nel pannello di controllo
-					cartaScartata.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
-					cartaSostituitaImageView.setImage(null);
-					showChangeTurnMessage(playerArea);
-				}
-
-				cardSostituita = gameController.sostituisciCarta(carta, cardIndexToReplace);
-				// Aggiungi l'immagine della carta sostituita nel pannello di controllo accanto al mazzo
-				if(cardSostituita != null && !needToChangeTurn) {
-					cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  cardSostituita.getNameCard()).toExternalForm())));
-					if (gameController.posizioneCarta(cardSostituita) == 14 || gameController.posizioneCarta(cardSostituita)==12) {
-						// Mostra la Select List per scegliere un numero da 1 a 10
-						showSelectList(playerArea, cardSostituita, cartaSostituitaImageView);
-					}
-				}
-
-
-				if(gameController.checkIsTrash(area)) {
-					System.out.println("Trash");
-					showTrashMessage(playerArea);
-				}
+				logicDeckScartato(playerArea, deckAndReplacement, cartaSostituitaImageView, cartaScartata, false);
 
 			});
 
@@ -396,41 +243,39 @@ public class Game {
 			controlLabel.setTextFill(textGradient);
 
 			controlPanel.getChildren().addAll(nameLabel, deckAndReplacement);
-
 			playerArea.getChildren().addAll(controlPanel);
 		}			
 
 		return playerArea;
 	}
 
-	public void showChangeTurnMessage(VBox playerArea) {
+	private void showChangeTurnMessage(VBox playerArea, HBox deckAndReplacement, ImageView cartaSostituitaImageView, ImageView cartaScartata) {
 		if (needToChangeTurn) {
-
-			if((numberOfPlayers - 2) == gameController.getCurrentPlayerIndex()) {
-				gameController.setCurrentPlayerIndex(0);
-			}else {
-				gameController.setCurrentPlayerIndex(gameController.getCurrentPlayerIndex() + 1);
-			}
+			gameController.setCurrentPlayerIndex((gameController.getCurrentPlayerIndex() + 1) % (numberOfPlayers - 1));
 
 			String nameTurn = gameController.getCurrentPlayerIndex() == 0 ? user.getNickname() : "Player " + (gameController.getCurrentPlayerIndex() + 1);
 			Label changeTurnLabel = new Label("Turno di: " + nameTurn);
 			changeTurnLabel.setFont(Font.font("Arial", FontWeight.BOLD, 40));
 			changeTurnLabel.setTextFill(Color.WHITE);
-			System.out.println("Utente in gioco ---> " + gameController.getCurrentPlayerIndex());
 
-			// Aggiungi il messaggio al pannello di controllo
 			playerArea.getChildren().add(changeTurnLabel);
 			carteMazzoDisabilitate = false;
+
 			if (cardDisabled != null) {
-				cardDisabled.setDisable(false); // Rimuovi il disabilitamento
-				cardDisabled.setOpacity(1.0); // Ripristina l'opacità
+				cardDisabled.setDisable(false);
+				cardDisabled.setOpacity(1.0);
+			}
+
+			if(gameController.getCurrentPlayerIndex() != 0) {
+				cardDisabled.setDisable(true);
+				cardDisabled.setOpacity(0.5);
+				automateBot(playerArea, deckAndReplacement, cartaSostituitaImageView, cartaScartata);
 			}
 		}
 	}
 
-	public void showTrashMessage(VBox playerArea) {
 
-
+	private void showTrashMessage(VBox playerArea) {
 		String nameTurn = gameController.getCurrentPlayerIndex() == 0 ? user.getNickname() : "Player " + (gameController.getCurrentPlayerIndex() + 1);
 		Label changeTurnLabel = new Label("TRASH: " + nameTurn);
 		changeTurnLabel.setFont(Font.font("Arial", FontWeight.BOLD, 40));
@@ -451,7 +296,6 @@ public class Game {
 				if (cardNodeToReplace instanceof ImageView) {
 					ImageView cardToReplace = (ImageView) cardNodeToReplace;
 					cardToReplace.setImage(newCardImage);
-					// Esegui altre operazioni qui, se necessario
 				}
 			}
 
@@ -470,47 +314,14 @@ public class Game {
 				if (cardNodeToReplace instanceof ImageView) {
 					ImageView cardToReplace = (ImageView) cardNodeToReplace;
 					cardToReplace.setImage(newCardImage);
-
-					// Esegui altre operazioni qui, se necessario
 				}
 			}
 
 		}
 	}
 
-	// Metodo per creare bottoni con stile personalizzato
-	private Button createStyledButton(String text, int size) {
-		Button button = new Button(text);
-		String originalStyle = "-fx-font-size: " + size + "px; -fx-background-color: linear-gradient(to bottom right, #8B4513, #D2691E); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 20;";
-		button.setStyle(originalStyle);
-
-		// Effetti del passaggio del mouse
-		button.setOnMouseEntered(e -> button.setStyle(originalStyle + "-fx-background-color: linear-gradient(to bottom right, #A0522D, #FF8C00);"));
-		button.setOnMouseExited(e -> button.setStyle(originalStyle + "-fx-background-color: linear-gradient(to bottom right, #8B4513, #D2691E);"));
-
-		return button;
-	}
-
-
-	public Region setBackground(Stage stage) {
-		Image sfondo = new Image(getClass().getResource(Constants.Path.GAME_BACKGROUND).toExternalForm());
-		Region contenuto = new Region();
-
-		BackgroundImage sfondoImage = new BackgroundImage(sfondo,
-				BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
-				BackgroundPosition.CENTER,
-				new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, true, true, true, true));
-		Background sfondoBackground = new Background(sfondoImage);
-		contenuto.setBackground(sfondoBackground);
-
-		contenuto.prefWidthProperty().bind(stage.widthProperty());
-		contenuto.prefHeightProperty().bind(stage.heightProperty());
-
-		return contenuto;
-	}
 
 	private void showSelectList(VBox playerArea, Card card, ImageView cartaSostituita) {
-
 
 		Label selectNumberLabel = new Label("Seleziona un numero da 1 a 10:");
 		selectNumberLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -568,9 +379,164 @@ public class Game {
 			System.out.println("Trash");
 			showTrashMessage(playerArea);
 		}
-		
+
 		// Rimuovi la Select List dal layout del giocatore
 		playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().startsWith("Seleziona un numero"));
-			playerArea.getChildren().remove(1);
+		playerArea.getChildren().remove(1);
+	}
+
+	
+	public void automateBot(VBox playerArea, HBox deckAndReplacement, ImageView cartaSostituitaImageView, ImageView cartaScartata) {
+		logicDeck(playerArea, deckAndReplacement, cartaSostituitaImageView, cartaScartata, true);
+		logicDeckScartato(playerArea, deckAndReplacement, cartaSostituitaImageView, cartaScartata, true);
+	}
+
+
+	private void logicDeck(VBox playerArea, HBox deckAndReplacement, ImageView cartaSostituitaImageView, ImageView cartaScartata, boolean automate) {
+		playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().contains("Turno di: "));
+		// Trova l'indice del giocatore nel GridPane (es. il primo giocatore)
+		int playerIndex = gameController.getCurrentPlayerIndex();
+		cardDisabled = (ImageView) deckAndReplacement.getChildren().get(0);
+		cardDisabled.setDisable(true);
+		cardDisabled.setOpacity(0.5); // Imposta l'opacità a metà per indicare che è disabilitata
+
+		if (!carteMazzoDisabilitate) {
+
+			Card carta = gameController.pescaCarta(); // Pesca una carta dal mazzo
+			int cardIndexToReplace = gameController.posizioneCarta(carta);
+
+			// Ottenere il pannello del giocatore corrispondente all'indice trovato
+			VBox area = (VBox) gameTable.getChildren().get(playerIndex);
+			boolean isCoperta = false;
+			System.out.println("MA COME STA MESSA ---> " + carta.toString());
+
+			if (cardIndexToReplace <= 5) { // Se il numero è tra 1 e 5, sostituisci la carta sopra
+				isCoperta = gameController.checkCartaCoperta(cardIndexToReplace - 1,  area, true);
+			} else if(cardIndexToReplace <= 10){ // Altrimenti, sostituisci la carta sotto
+				isCoperta = gameController.checkCartaCoperta(cardIndexToReplace - 6, area, false);
+			}
+			System.out.println("Dimme che sta coperta -> " + isCoperta);
+
+			if (((cardIndexToReplace >= 1 && cardIndexToReplace <= 10)) && !gameController.checkExistCard(carta, !isCoperta)) {
+				// Ottieni l'immagine corrispondente alla carta pescata dal mazzo
+				ImageView cartaPescataImageView = new ImageView(new Image(getClass().getResource(Constants.Path.CARD + carta.getNameCard()).toExternalForm()));
+				cartaPescataImageView.setFitWidth(100);
+				cartaPescataImageView.setFitHeight(160);
+
+
+				if (cardIndexToReplace <= 5) { // Se il numero è tra 1 e 5, sostituisci la carta sopra
+					replaceCardAbove(cardIndexToReplace - 1, cartaPescataImageView.getImage(), area);
+				} else { // Altrimenti, sostituisci la carta sotto
+					replaceCardBelow(cardIndexToReplace - 6, cartaPescataImageView.getImage(), area);
+				}
+
+				cardSostituita = gameController.sostituisciCarta(carta, cardIndexToReplace);
+
+				// Aggiungi l'immagine della carta sostituita nel pannello di controllo accanto al mazzo
+				if(cardSostituita != null) {
+					if (gameController.posizioneCarta(cardSostituita)==14 || gameController.posizioneCarta(cardSostituita)==12) {
+						if(automate) {
+							int firstBackedCard = gameController.getFirstBacked(area) + 1;
+							handleSelectListSelection(firstBackedCard, area, cardSostituita, cartaSostituitaImageView);
+						}else {
+							showSelectList(playerArea, cardSostituita, cartaSostituitaImageView);
+						}
+					}
+					cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  cardSostituita.getNameCard()).toExternalForm())));
+				}else if(gameController.posizioneCarta(carta)==14 || gameController.posizioneCarta(carta)==12) {
+					cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
+				}
+				carteMazzoDisabilitate = true;
+				needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
+			}else {
+				if (gameController.posizioneCarta(carta)==14 || gameController.posizioneCarta(carta)==12) {
+					// Mostra la Select List per scegliere un numero da 1 a 10
+					cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
+					cartaSostituitaImageView.setDisable(true);
+					cartaSostituitaImageView.setOpacity(0.5);
+					
+					if(automate) {
+						int firstBackedCard = gameController.getFirstBacked(area) + 1;
+						handleSelectListSelection(firstBackedCard, area, cardSostituita, cartaSostituitaImageView);
+					}else {
+						showSelectList(playerArea, cardSostituita, cartaSostituitaImageView);
+					}
+				}else {
+					//aggiungi carta nel mazzo scartato
+					needToChangeTurn = true;
+					cartaSostituitaImageView.setImage(null);
+					cartaScartata.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
+					showChangeTurnMessage(playerArea, deckAndReplacement, cartaSostituitaImageView, cartaScartata);
+				}
+			}
+
+//			if(gameController.checkIsTrash(area)) {
+//				System.out.println("Trash");
+//				//showTrashMessage(playerArea);
+//			}
+			
+		}
+	}
+	
+	public void logicDeckScartato(VBox playerArea, HBox deckAndReplacement, ImageView cartaSostituitaImageView, ImageView cartaScartata, boolean automate) {
+		// Trova l'indice del giocatore nel GridPane (es. il primo giocatore)
+		int playerIndex = gameController.getCurrentPlayerIndex();
+		Card carta = cardSostituita;
+		int cardIndexToReplace = gameController.posizioneCarta(carta); // Questo è un esempio, potresti ottenere il numero da qualche altra parte
+		VBox area = (VBox) gameTable.getChildren().get(playerIndex);
+		boolean isCoperta = false;
+		if (cardIndexToReplace <= 5) { // Se il numero è tra 1 e 5, sostituisci la carta sopra
+			isCoperta = gameController.checkCartaCoperta(cardIndexToReplace - 1,  area, true);
+		} else if(cardIndexToReplace <= 10) { // Altrimenti, sostituisci la carta sotto
+			isCoperta = gameController.checkCartaCoperta(cardIndexToReplace - 6, area, false);
+		}
+
+		if ((cardIndexToReplace >= 1 && cardIndexToReplace <= 10) && !gameController.checkExistCard(carta, !isCoperta)) {
+
+			needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
+
+			// Ottieni l'immagine corrispondente alla carta pescata dal mazzo
+			ImageView cartaPescataImageView = new ImageView(new Image(getClass().getResource(Constants.Path.CARD + carta.getNameCard()).toExternalForm()));
+			cartaPescataImageView.setFitWidth(100);
+			cartaPescataImageView.setFitHeight(160);
+
+			// Ottenere il pannello del giocatore corrispondente all'indice trovato
+			if (cardIndexToReplace <= 5) { // Se il numero è tra 1 e 5, sostituisci la carta sopra
+				replaceCardAbove(cardIndexToReplace - 1, cartaPescataImageView.getImage(), area);
+			} else { // Altrimenti, sostituisci la carta sotto
+				replaceCardBelow(cardIndexToReplace - 6, cartaPescataImageView.getImage(), area);
+			}
+			playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().contains("Turno di: "));
+		}else {
+			needToChangeTurn = true;
+			// Pulisci l'immagine della carta sostituita nel pannello di controllo
+			cartaScartata.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
+			cartaSostituitaImageView.setImage(null);
+			showChangeTurnMessage(playerArea, deckAndReplacement, cartaSostituitaImageView, cartaScartata);
+		}
+
+		cardSostituita = gameController.sostituisciCarta(carta, cardIndexToReplace);
+		// Aggiungi l'immagine della carta sostituita nel pannello di controllo accanto al mazzo
+		if(cardSostituita != null && !needToChangeTurn) {
+			cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  cardSostituita.getNameCard()).toExternalForm())));
+			if (gameController.posizioneCarta(cardSostituita) == 14 || gameController.posizioneCarta(cardSostituita)==12) {
+				// Mostra la Select List per scegliere un numero da 1 a 10
+				if(automate) {
+					int firstBackedCard = gameController.getFirstBacked(area) + 1;
+					handleSelectListSelection(firstBackedCard, area, cardSostituita, cartaSostituitaImageView);
+				}else {
+					showSelectList(playerArea, cardSostituita, cartaSostituitaImageView);
+				}
+			}
+		}
+
+//		if(gameController.checkIsTrash(area)) {
+//			System.out.println("Trash");
+//			showTrashMessage(playerArea);
+//		}
+		
+		if(automate && cardSostituita != null) {
+			logicDeckScartato(area, deckAndReplacement, cartaSostituitaImageView, cartaScartata, automate);
+		}
 	}
 }
