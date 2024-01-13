@@ -190,6 +190,7 @@ public class GameController {
 		}
 
 		System.out.println("So tutte scoperte TRASH");
+		
 		return true;
 	}
 	

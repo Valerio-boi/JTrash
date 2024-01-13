@@ -251,21 +251,26 @@ public class Game {
 
 	private void showChangeTurnMessage(VBox playerArea, HBox deckAndReplacement, ImageView cartaSostituitaImageView, ImageView cartaScartata) {
 		if (needToChangeTurn) {
-			gameController.setCurrentPlayerIndex((gameController.getCurrentPlayerIndex() + 1) % (numberOfPlayers - 1));
-
+			if((numberOfPlayers - 2) == gameController.getCurrentPlayerIndex()) {
+				gameController.setCurrentPlayerIndex(0);
+			}else {
+				gameController.setCurrentPlayerIndex(gameController.getCurrentPlayerIndex() + 1);
+			}
+			
+			carteMazzoDisabilitate = false;
 			String nameTurn = gameController.getCurrentPlayerIndex() == 0 ? user.getNickname() : "Player " + (gameController.getCurrentPlayerIndex() + 1);
 			Label changeTurnLabel = new Label("Turno di: " + nameTurn);
 			changeTurnLabel.setFont(Font.font("Arial", FontWeight.BOLD, 40));
 			changeTurnLabel.setTextFill(Color.WHITE);
 
 			playerArea.getChildren().add(changeTurnLabel);
-			carteMazzoDisabilitate = false;
 
 			if (cardDisabled != null) {
 				cardDisabled.setDisable(false);
 				cardDisabled.setOpacity(1.0);
 			}
 
+			System.out.println("Player in gioco con cambio turno ---> " + gameController.getCurrentPlayerIndex());
 			if(gameController.getCurrentPlayerIndex() != 0) {
 				cardDisabled.setDisable(true);
 				cardDisabled.setOpacity(0.5);
@@ -283,6 +288,8 @@ public class Game {
 
 		// Aggiungi il messaggio al pannello di controllo
 		playerArea.getChildren().add(changeTurnLabel);
+
+			
 	}
 
 	// Metodo per sostituire la carta sopra del giocatore
@@ -364,12 +371,14 @@ public class Game {
 		cardSostituita = gameController.sostituisciCarta(card, selectedNumber);
 		cartaSostituita.setImage((new Image(getClass().getResource(Constants.Path.CARD +  cardSostituita.getNameCard()).toExternalForm())));
 		// Puoi eseguire ulteriori azioni qui, se necessario
-
-		if (gameController.posizioneCarta(cardSostituita) == 14 || gameController.posizioneCarta(cardSostituita)==12) {
+		ImageView cartaSostituitaImageView = new ImageView();
+		if (gameController.posizioneCarta(cardSostituita) == 14 || gameController.posizioneCarta(cardSostituita)==12 && gameController.getCurrentPlayerIndex() == 0) {
 			// Mostra la Select List per scegliere un numero da 1 a 10
-			ImageView cartaSostituitaImageView = new ImageView();
 			cartaSostituitaImageView.setImage(new Image(getClass().getResource(Constants.Path.CARD + cardSostituita.getNameCard()).toExternalForm()));
 			showSelectList(playerArea, cardSostituita, cartaSostituitaImageView);
+		}else if(gameController.posizioneCarta(cardSostituita) == 14 || gameController.posizioneCarta(cardSostituita)==12) {
+			int firstBackedCard = gameController.getFirstBacked(area) + 1;
+			handleSelectListSelection(firstBackedCard,  playerArea,  cardSostituita,  cartaSostituita);
 		}
 
 		cartaSostituita.setDisable(false);
@@ -382,7 +391,10 @@ public class Game {
 
 		// Rimuovi la Select List dal layout del giocatore
 		playerArea.getChildren().removeIf(node -> node instanceof Label && ((Label) node).getText().startsWith("Seleziona un numero"));
-		playerArea.getChildren().remove(1);
+		if(gameController.getCurrentPlayerIndex() == 0) {
+			playerArea.getChildren().remove(1);
+		}
+			
 	}
 
 	
@@ -415,6 +427,7 @@ public class Game {
 			} else if(cardIndexToReplace <= 10){ // Altrimenti, sostituisci la carta sotto
 				isCoperta = gameController.checkCartaCoperta(cardIndexToReplace - 6, area, false);
 			}
+			
 			System.out.println("Dimme che sta coperta -> " + isCoperta);
 
 			if (((cardIndexToReplace >= 1 && cardIndexToReplace <= 10)) && !gameController.checkExistCard(carta, !isCoperta)) {
@@ -437,7 +450,7 @@ public class Game {
 					if (gameController.posizioneCarta(cardSostituita)==14 || gameController.posizioneCarta(cardSostituita)==12) {
 						if(automate) {
 							int firstBackedCard = gameController.getFirstBacked(area) + 1;
-							handleSelectListSelection(firstBackedCard, area, cardSostituita, cartaSostituitaImageView);
+							handleSelectListSelection(firstBackedCard, playerArea, cardSostituita, cartaSostituitaImageView);
 						}else {
 							showSelectList(playerArea, cardSostituita, cartaSostituitaImageView);
 						}
@@ -450,17 +463,17 @@ public class Game {
 				needToChangeTurn = false; // Imposta a false quando viene cliccato il mazzo
 			}else {
 				if (gameController.posizioneCarta(carta)==14 || gameController.posizioneCarta(carta)==12) {
+					
+					if(automate) {
+						int firstBackedCard = gameController.getFirstBacked(area) + 1;
+						handleSelectListSelection(firstBackedCard, playerArea, carta, cartaSostituitaImageView);
+					}else {
+						showSelectList(playerArea, carta, cartaSostituitaImageView);
+					}
 					// Mostra la Select List per scegliere un numero da 1 a 10
 					cartaSostituitaImageView.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
 					cartaSostituitaImageView.setDisable(true);
 					cartaSostituitaImageView.setOpacity(0.5);
-					
-					if(automate) {
-						int firstBackedCard = gameController.getFirstBacked(area) + 1;
-						handleSelectListSelection(firstBackedCard, area, cardSostituita, cartaSostituitaImageView);
-					}else {
-						showSelectList(playerArea, cardSostituita, cartaSostituitaImageView);
-					}
 				}else {
 					//aggiungi carta nel mazzo scartato
 					needToChangeTurn = true;
@@ -470,10 +483,10 @@ public class Game {
 				}
 			}
 
-//			if(gameController.checkIsTrash(area)) {
-//				System.out.println("Trash");
-//				//showTrashMessage(playerArea);
-//			}
+			if(gameController.checkIsTrash(area)) {
+				System.out.println("Trash");
+				showTrashMessage(playerArea);
+			}
 			
 		}
 	}
@@ -513,6 +526,7 @@ public class Game {
 			cartaScartata.setImage((new Image(getClass().getResource(Constants.Path.CARD +  carta.getNameCard()).toExternalForm())));
 			cartaSostituitaImageView.setImage(null);
 			showChangeTurnMessage(playerArea, deckAndReplacement, cartaSostituitaImageView, cartaScartata);
+			return ;
 		}
 
 		cardSostituita = gameController.sostituisciCarta(carta, cardIndexToReplace);
@@ -523,20 +537,21 @@ public class Game {
 				// Mostra la Select List per scegliere un numero da 1 a 10
 				if(automate) {
 					int firstBackedCard = gameController.getFirstBacked(area) + 1;
-					handleSelectListSelection(firstBackedCard, area, cardSostituita, cartaSostituitaImageView);
+					handleSelectListSelection(firstBackedCard, playerArea, cardSostituita, cartaSostituitaImageView);
 				}else {
 					showSelectList(playerArea, cardSostituita, cartaSostituitaImageView);
 				}
 			}
 		}
 
-//		if(gameController.checkIsTrash(area)) {
-//			System.out.println("Trash");
-//			showTrashMessage(playerArea);
-//		}
+		if(gameController.checkIsTrash(area)) {
+			System.out.println("Trash");
+			showTrashMessage(playerArea);
+			return ;
+		}
 		
 		if(automate && cardSostituita != null) {
-			logicDeckScartato(area, deckAndReplacement, cartaSostituitaImageView, cartaScartata, automate);
+			logicDeckScartato(playerArea, deckAndReplacement, cartaSostituitaImageView, cartaScartata, automate);
 		}
 	}
 }
